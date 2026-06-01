@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>Figurinhas Copa 2026 ..</title>
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#155eef">
   <style>
     :root{--bg:#f5f7fb;--card:#fff;--ink:#121826;--muted:#667085;--line:#e5e7ef;--ok:#128a46;--brand:#155eef;--brand2:#eff4ff;--shadow:0 8px 24px rgba(16,24,40,.08)}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding-bottom:96px}button,input{font:inherit}
@@ -132,6 +134,22 @@ function buildPrint(){
   $('printArea').innerHTML=`<div class="print-title">Figurinhas faltantes — Copa 2026</div><p class="print-sub">Ordem por grupos. Gerado em ${new Date().toLocaleDateString('pt-BR')}.</p>${html}`
 }
 $('q').oninput=render;$('quickBtn').onclick=quickMark;$('quick').addEventListener('keydown',e=>{if(e.key==='Enter')quickMark()});$('exportCsv').onclick=exportCsv;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('printMissing').onclick=()=>{buildPrint();window.print()};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('moreBtn').onclick=()=>{const a=prompt('Digite: 1 para marcar tudo, 2 para limpar tudo');if(a==='1'){if(!confirmBatch(`Marcar todas as ${stickers.length} figurinhas?`))return;stickers.forEach(x=>setDone(x.id,true));save();render()}if(a==='2'){if(!confirmBatch('Desmarcar todas as figurinhas?'))return;state.clear();save();render()}};
+
+// register service worker for PWA
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('service-worker.js').then(reg=>{
+    console.log('Service worker registered', reg);
+  }).catch(err=>console.warn('Service worker failed', err));
+}
+
+// simple beforeinstallprompt handler (optional)
+let deferredPrompt;
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  // You could show a custom install button and call deferredPrompt.prompt() on click
+});
+
 render();
 </script>
 </body>
