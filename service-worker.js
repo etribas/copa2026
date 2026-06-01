@@ -2,8 +2,8 @@ const CACHE_NAME = 'figurinhas-v1';
 const ASSETS = [
   './controle-album.html',
   './manifest.json',
-  './test-icon-192.png',
-  './test-icon-512.png'
+  './icon-from-jpeg-192.png',
+  './icon-from-jpeg-512.png'
 ];
 
 self.addEventListener('install', event => {
