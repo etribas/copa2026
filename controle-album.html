@@ -79,6 +79,7 @@ const GRUPOS=[
   {grupo:'Extras',secoes:[{nome:'FIFA World Cup',prefixo:'FWC',numeros:n(0,19)},{nome:'Figurinhas da Coca-Cola',prefixo:'CC',numeros:n(1,14)}]}
 ];
 const FLAGS={MEX:'mx',RSA:'za',KOR:'kr',CZE:'cz',CAN:'ca',BIH:'ba',QAT:'qa',SUI:'ch',BRA:'br',MAR:'ma',HAI:'ht',SCO:'gb-sct',USA:'us',PAR:'py',AUS:'au',TUR:'tr',GER:'de',CUW:'cw',CIV:'ci',ECU:'ec',NED:'nl',JPN:'jp',SWE:'se',TUN:'tn',BEL:'be',EGY:'eg',IRN:'ir',NZL:'nz',ESP:'es',CPV:'cv',KSA:'sa',URU:'uy',FRA:'fr',SEN:'sn',IRQ:'iq',NOR:'no',ARG:'ar',ALG:'dz',AUT:'at',JOR:'jo',POR:'pt',COD:'cd',UZB:'uz',COL:'co',ENG:'gb-eng',CRO:'hr',GHA:'gh',PAN:'pa'};
+const FLAG_EMOJIS={MEX:'🇲🇽',RSA:'🇿🇦',KOR:'🇰🇷',CZE:'🇨🇿',CAN:'🇨🇦',BIH:'🇧🇦',QAT:'🇶🇦',SUI:'🇨🇭',BRA:'🇧🇷',MAR:'🇲🇦',HAI:'🇭🇹',SCO:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',USA:'🇺🇸',PAR:'🇵🇾',AUS:'🇦🇺',TUR:'🇹🇷',GER:'🇩🇪',CUW:'🇨🇼',CIV:'🇨🇮',ECU:'🇪🇨',NED:'🇳🇱',JPN:'🇯🇵',SWE:'🇸🇪',TUN:'🇹🇳',BEL:'🇧🇪',EGY:'🇪🇬',IRN:'🇮🇷',NZL:'🇳🇿',ESP:'🇪🇸',CPV:'🇨🇻',KSA:'🇸🇦',URU:'🇺🇾',FRA:'🇫🇷',SEN:'🇸🇳',IRQ:'🇮🇶',NOR:'🇳🇴',ARG:'🇦🇷',ALG:'🇩🇿',AUT:'🇦🇹',JOR:'🇯🇴',POR:'🇵🇹',COD:'🇨🇩',UZB:'🇺🇿',COL:'🇨🇴',ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',CRO:'🇭🇷',GHA:'🇬🇭',PAN:'🇵🇦',FWC:'⭐',CC:''}
 const GROUP_COLORS=['#155eef','#7a5af8','#dd2590','#eaaa08','#12b76a','#06aed4','#f79009','#f04438','#6172f3','#9e77ed','#17b26a','#2e90fa','#667085','#344054'];
 const STORAGE_KEY='figurinhas-copa-2026-mobile-v4';
 const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
@@ -205,11 +206,14 @@ function buildPrint(){
         if(fwcRendered) return;
         fwcRendered = true;
         const miss = allFwcMiss;
-        rows.push(`<div class="print-row"><div class="print-team">FWC</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);
+        const emoji = FLAG_EMOJIS[sec.prefixo] || '★';
+        const teamLabel = `${emoji} FWC`;
+        rows.push(`<div class="print-row"><div class="print-team">${teamLabel}</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);
         return;
       }
       const miss = stickers.filter(x=>x.grupo===g.grupo&&x.secao===sec.nome&&!isDone(x.id)).map(x=>stickerLabel(x));
-      const teamLabel = sec.prefixo==='CC' ? esc(sec.nome) : `${flagHtml(sec.prefixo)}${esc(sec.nome)}`;
+      const emoji = FLAG_EMOJIS[sec.prefixo] || '★';
+      const teamLabel = sec.prefixo==='CC' ? esc(sec.nome) : `${emoji} ${esc(sec.nome)}`;
       rows.push(`<div class="print-row"><div class="print-team">${teamLabel}</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);
     });
     if(!rows.length) return '';
