@@ -17,7 +17,7 @@
     .group-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px;padding:8px 8px 8px 10px;border-radius:14px}.group-head h2{font-size:16px;margin:0}.group-actions{display:flex;gap:6px}.mini{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 9px;font-size:12px;font-weight:800;color:#344054}
     .team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
     .team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;font-weight:800;color:#344054}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 14px 14px}.sticker{min-height:58px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:8px 6px;text-align:center;font-weight:950;cursor:pointer}.sticker small{display:block;margin-top:3px;font-size:10px;color:var(--muted);font-weight:750}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
-    .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
+    .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
     @media(min-width:900px){body{padding-bottom:30px}.fabbar{position:sticky;bottom:10px;margin:18px auto;transform:none;left:auto;right:auto}.grid{grid-template-columns:repeat(10,1fr)}}
     @media print{
@@ -53,6 +53,7 @@
 
   <nav class="fabbar">
     <button class="primary" id="printMissing">Imprimir<br>faltantes</button>
+    <button id="shareBtn">Compartilhar<br>link</button>
     <button id="exportCsv">Exportar<br>CSV</button>
     <label>Importar<br>CSV<input id="importCsv" type="file" accept=".csv,text/csv"></label>
     <button id="expandAll">Abrir<br>todas</button>
@@ -221,7 +222,59 @@ function buildPrint(){
   }).join('');
   $('printArea').innerHTML=`<div class="print-title">Figurinhas faltantes — Copa 2026</div><p class="print-sub">Ordem por grupos. Gerado em ${new Date().toLocaleDateString('pt-BR')}.</p>${html}`
 }
-$('q').oninput=render;$('exportCsv').onclick=exportCsv;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('printMissing').onclick=()=>{buildPrint();window.print()};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();$('moreBtn').onclick=()=>{const a=prompt('Digite: 1 para marcar tudo, 2 para limpar tudo');if(a==='1'){if(!confirmBatch(`Marcar todas as ${stickers.length} figurinhas?`))return;stickers.forEach(x=>setDone(x.id,true));save();render()}if(a==='2'){if(!confirmBatch('Desmarcar todas as figurinhas?'))return;state.clear();save();render()}};
+function generateShareLink(){
+  const byPrefix={};
+  stickers.filter(x=>isDone(x.id)).forEach(x=>{if(!byPrefix[x.prefixo])byPrefix[x.prefixo]=[];byPrefix[x.prefixo].push(+x.numero)});
+  if(!Object.keys(byPrefix).length){alert('Marque algumas figurinhas para compartilhar');return null}
+  const data=JSON.stringify(byPrefix);
+  const encoded=btoa(data).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  return `${window.location.origin}${window.location.pathname}#d=${encoded}`
+}
+function shareLink(){
+  const url=generateShareLink();
+  if(!url)return;
+  if(navigator.share){
+    navigator.share({title:'Álbum Copa 2026',text:'Veja meu álbum de figurinhas da Copa 2026! 🏆',url:url}).catch(()=>{showShareModal(url)})
+  }else{
+    showShareModal(url);
+  }
+}
+function showShareModal(url){
+  const id='shareModal'+Math.random().toString(36).slice(2);
+  const html=`<div id="${id}" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px"><div style="background:#fff;border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)"><h2 style="margin:0 0 12px;font-size:16px;font-weight:700">Compartilhar Álbum</h2><p style="margin:0 0 20px;font-size:13px;color:#667085">Escolha como compartilhar seu álbum:</p><div style="display:flex;gap:8px;margin-bottom:8px"><button id="copyBtn${id}" style="flex:1;background:#155eef;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">📋 Copiar Link</button><button id="whatsappBtn${id}" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">💬 WhatsApp</button></div><button id="closeBtn${id}" style="width:100%;background:#f2f4f7;border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">Fechar</button></div></div>`;
+  const container=document.createElement('div');
+  container.innerHTML=html;
+  document.body.appendChild(container);
+  $('copyBtn'+id).onclick=()=>{navigator.clipboard.writeText(url).then(()=>{alert('✓ Link copiado!')}).catch(()=>{alert('Erro ao copiar')});container.remove()};
+  $('whatsappBtn'+id).onclick=()=>{const msg='Meu álbum Copa 2026 🏆\n'+url;window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`,'_blank');container.remove()};
+  $('closeBtn'+id).onclick=()=>container.remove();
+}
+function loadFromLink(){
+  const hash=window.location.hash.substring(1);
+  if(!hash.startsWith('d='))return;
+  const encoded=hash.substring(2);
+  try{
+    const padded=encoded.replace(/-/g,'+').replace(/_/g,'/');
+    const padding=(4-(padded.length%4))%4;
+    const data=JSON.parse(atob(padded+'='.repeat(padding)));
+    if(confirm('⚠️ Aviso: Carregar este link substituirá suas figurinhas locais. Deseja continuar?')){
+      state.clear();
+      Object.entries(data).forEach(([prefixo,numeros])=>{numeros.forEach(numero=>{state.add(`${prefixo}-${numero}`)})});
+      save();
+      render();
+      window.history.replaceState({},'',window.location.pathname);
+      alert('✓ Figurinhas carregadas com sucesso!');
+    }else{
+      window.history.replaceState({},'',window.location.pathname);
+    }
+  }catch(e){
+    console.error('Erro ao carregar link:',e);
+    alert('Erro ao processar link');
+  }
+}
+$('q').oninput=render;$('shareBtn').onclick=shareLink;$('exportCsv').onclick=exportCsv;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('printMissing').onclick=()=>{buildPrint();window.print()};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();$('moreBtn').onclick=()=>{const a=prompt('Digite: 1 para marcar tudo, 2 para limpar tudo');if(a==='1'){if(!confirmBatch(`Marcar todas as ${stickers.length} figurinhas?`))return;stickers.forEach(x=>setDone(x.id,true));save();render()}if(a==='2'){if(!confirmBatch('Desmarcar todas as figurinhas?'))return;state.clear();save();render()}};
+
+loadFromLink();
 
 // register service worker for PWA
 if('serviceWorker' in navigator){
