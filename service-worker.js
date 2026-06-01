@@ -1,4 +1,4 @@
-const CACHE_NAME = 'figurinhas-v4';
+const CACHE_NAME = 'figurinhas-v5';
 const ASSETS = [
   './controle-album.html',
   './manifest.json',
