@@ -17,7 +17,22 @@
     .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
     @media(min-width:900px){body{padding-bottom:30px}.fabbar{position:sticky;bottom:10px;margin:18px auto;transform:none;left:auto;right:auto}.grid{grid-template-columns:repeat(10,1fr)}}
-    @media print{@page{size:A4 portrait;margin:6mm}body{background:white;font-size:7px;padding:0}.appbar,main,.fabbar{display:none!important}.print-only{display:block!important;color:#000}#printArea{column-count:2;column-gap:10mm;column-fill:balance} .print-title{font-size:11px;font-weight:800;margin:0 0 4px} .print-sub{font-size:7px;margin:0 0 5px} .print-group{font-weight:800;background:#f8f8f8;border:1px solid #ccc;border-radius:4px;padding:.8mm .8mm;margin:.8mm 0;break-inside:avoid;page-break-inside:avoid} .print-row{display:grid;grid-template-columns:26mm 1fr;gap:1.2mm;border-bottom:.2pt solid #ddd;padding:.5mm 0;break-inside:avoid;page-break-inside:avoid} .print-team{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:7px} .print-missing{word-spacing:.7mm;font-size:6.2px;line-height:1.2} .empty{color:#666}}
+    @media print{
+      @page{size:A4 portrait;margin:6mm}
+      body{background:white;font-size:8px;padding:0}
+      .appbar,main,.fabbar{display:none!important}
+      .print-only{display:block!important;color:#000}
+      #printArea{column-count:2;column-gap:10mm;column-fill:balance}
+      .print-title{font-size:12px;font-weight:800;margin:0 0 4px}
+      .print-sub{font-size:8px;margin:0 0 5px}
+      .print-group{display:flex;gap:6px;align-items:stretch;background:#fff;border:2px solid #000;border-radius:4px;padding:.8mm;margin:.8mm 0;break-inside:avoid;page-break-inside:avoid}
+      .group-letter{width:18mm;min-width:18mm;background:#f0f0f0;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px}
+      .group-rows{flex:1}
+      .print-row{display:grid;grid-template-columns:28mm 1fr;gap:1.2mm;border-bottom:.2pt solid #ddd;padding:.5mm 0;break-inside:avoid;page-break-inside:avoid}
+      .print-team{font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:8px}
+      .print-missing{word-spacing:.8mm;font-size:7.2px;line-height:1.2}
+      .empty{color:#666}
+    }
   </style>
 </head>
 <body>
@@ -93,7 +108,29 @@ function exportCsv(){const rows=[['id','grupo','secao','prefixo','numero','colad
 function parseLine(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const ch=line[i],nx=line[i+1];if(ch==='"'&&quoted&&nx==='"'){cur+='"';i++}else if(ch==='"')quoted=!quoted;else if((ch===','||ch===';')&&!quoted){out.push(cur.trim());cur=''}else cur+=ch}out.push(cur.trim());return out.map(v=>v.replace(/^"|"$/g,'').replaceAll('""','"'))}
 function importCsv(text){if(!confirmBatch('Importar CSV pode marcar ou desmarcar várias figurinhas. Continuar?'))return;const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return;const h=parseLine(lines.shift()).map(norm);const id=h.indexOf('id'),pre=h.indexOf('prefixo'),num=h.indexOf('numero'),col=h.indexOf('colada');lines.forEach(line=>{const c=parseLine(line);let sid=id>=0?c[id]:'';if(!sid&&pre>=0&&num>=0)sid=`${c[pre]}-${c[num]}`;if(!stickers.some(x=>x.id===sid))return;setDone(sid,['1','sim','s','true','x','colada','yes','y'].includes(norm(c[col])))});save();render()}
 function quickMark(){const txt=$('quick').value;const tokens=txt.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean);let count=0;tokens.forEach(t=>{const m=t.match(/^([a-zA-Z]{2,4})\s*-?\s*(\d{1,2})$/);if(!m)return;const sid=`${m[1].toUpperCase()}-${Number(m[2])}`;const item=stickers.find(x=>x.id===sid||`${x.prefixo}-${Number(x.numero)}`===sid);if(item){setDone(item.id,true);count++}});$('quick').value='';save();render();alert(count?`${count} figurinha(s) marcada(s).`:'Nenhuma figurinha encontrada. Exemplo: BRA1, FWC8')}
-function buildPrint(){const allFwcMiss=stickers.filter(x=>x.prefixo==='FWC'&&!isDone(x.id)).map(x=>stickerLabel(x));let fwcRendered=false;const html=GRUPOS.map(g=>{const groupHtml=[`<div class="print-group">${esc(g.grupo)}</div>`];g.secoes.forEach(sec=>{if(sec.prefixo==='FWC'){if(fwcRendered)return;fwcRendered=true;const miss=allFwcMiss;groupHtml.push(`<div class="print-row"><div class="print-team">FWC</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);return;}const miss=stickers.filter(x=>x.grupo===g.grupo&&x.secao===sec.nome&&!isDone(x.id)).map(x=>stickerLabel(x));groupHtml.push(`<div class="print-row"><div class="print-team">${esc(sec.nome)}</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`)});return groupHtml.join('')}).join('');$('printArea').innerHTML=`<div class="print-title">Figurinhas faltantes — Copa 2026</div><p class="print-sub">Ordem por grupos. Gerado em ${new Date().toLocaleDateString('pt-BR')}.</p>${html}`}
+function buildPrint(){
+  const allFwcMiss = stickers.filter(x=>x.prefixo==='FWC'&&!isDone(x.id)).map(x=>stickerLabel(x));
+  let fwcRendered = false;
+  const html = GRUPOS.map(g=>{
+    const m = (g.grupo||'').match(/Grupo\s+([A-Z])/i);
+    const groupLetter = m ? m[1].toUpperCase() : (g.grupo?g.grupo.charAt(0).toUpperCase():'');
+    const rows = [];
+    g.secoes.forEach(sec=>{
+      if(sec.prefixo==='FWC'){
+        if(fwcRendered) return;
+        fwcRendered = true;
+        const miss = allFwcMiss;
+        rows.push(`<div class="print-row"><div class="print-team">FWC</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);
+        return;
+      }
+      const miss = stickers.filter(x=>x.grupo===g.grupo&&x.secao===sec.nome&&!isDone(x.id)).map(x=>stickerLabel(x));
+      rows.push(`<div class="print-row"><div class="print-team">${esc(sec.nome)}</div><div class="print-missing ${miss.length?'':'empty'}">${miss.length?esc(miss.join(' ')):'Completa'}</div></div>`);
+    });
+    if(!rows.length) return '';
+    return `<div class="print-group"><div class="group-letter">${esc(groupLetter)}</div><div class="group-rows">${rows.join('')}</div></div>`;
+  }).join('');
+  $('printArea').innerHTML=`<div class="print-title">Figurinhas faltantes — Copa 2026</div><p class="print-sub">Ordem por grupos. Gerado em ${new Date().toLocaleDateString('pt-BR')}.</p>${html}`
+}
 $('q').oninput=render;$('quickBtn').onclick=quickMark;$('quick').addEventListener('keydown',e=>{if(e.key==='Enter')quickMark()});$('exportCsv').onclick=exportCsv;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('printMissing').onclick=()=>{buildPrint();window.print()};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('moreBtn').onclick=()=>{const a=prompt('Digite: 1 para marcar tudo, 2 para limpar tudo');if(a==='1'){if(!confirmBatch(`Marcar todas as ${stickers.length} figurinhas?`))return;stickers.forEach(x=>setDone(x.id,true));save();render()}if(a==='2'){if(!confirmBatch('Desmarcar todas as figurinhas?'))return;state.clear();save();render()}};
 render();
 </script>
