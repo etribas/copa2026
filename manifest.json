@@ -1,7 +1,7 @@
 {
   "name": "Figurinhas Copa 2026",
   "short_name": "Figurinhas",
-  "start_url": "./controle-album.html",
+  "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#155eef",
@@ -19,5 +19,6 @@
       "type": "image/png",
       "purpose": "any"
     }
-  ]
+  ],
+  "installable": true
 }

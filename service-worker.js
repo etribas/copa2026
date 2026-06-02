@@ -1,6 +1,6 @@
-const CACHE_NAME = 'figurinhas-v6';
+const CACHE_NAME = 'figurinhas-v16';
 const ASSETS = [
-  './controle-album.html',
+  './index.html',
   './manifest.json',
   './icon-from-jpeg-192.png',
   './icon-from-jpeg-512.png'
@@ -26,14 +26,13 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(cached => {
       if (cached) return cached;
       return fetch(event.request).then(resp => {
-        // only cache GET requests with successful response
         if (!event.request.url.startsWith('http')) return resp;
-        if (resp && resp.status === 200 && event.request.method === 'GET'){
+        if (resp && resp.status === 200 && event.request.method === 'GET') {
           const copy = resp.clone();
-          caches.open(CACHE_NAME).then(cache=>cache.put(event.request, copy));
+          caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
         return resp;
-      }).catch(()=>caches.match('./controle-album.html'));
+      }).catch(() => caches.match('./index.html'))
     })
   );
 });

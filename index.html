@@ -11,13 +11,20 @@
   <style>
     :root{--bg:#f5f7fb;--card:#fff;--ink:#121826;--muted:#667085;--line:#e5e7ef;--ok:#128a46;--brand:#155eef;--brand2:#eff4ff;--shadow:0 8px 24px rgba(16,24,40,.08)}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding-bottom:96px}button,input{font:inherit}
-    .appbar{position:sticky;top:0;z-index:10;background:rgba(245,247,251,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 12px}.title{display:flex;justify-content:space-between;align-items:center;gap:10px;max-width:960px;margin:auto}.title h1{font-size:18px;margin:0}.pill{font-size:12px;color:var(--brand);background:var(--brand2);padding:5px 9px;border-radius:99px;font-weight:800;white-space:nowrap}
-    .searchbar{max-width:960px;margin:10px auto 0}.searchbar input{width:100%;border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}.stats{max-width:960px;margin:12px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 7px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--muted)}.sortbar{max-width:960px;margin:12px auto 0;display:flex;gap:8px;flex-wrap:wrap}.sortbar button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:800;color:#344054;cursor:pointer}.sortbar button.active{background:var(--brand);border-color:var(--brand);color:#fff}.tabs{max-width:960px;margin:12px auto 0;display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 13px;white-space:nowrap;font-weight:800;color:#344054}.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .appbar{position:sticky;top:0;z-index:10;background:rgba(245,247,251,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 12px}.title{display:flex;justify-content:flex-start;align-items:center;gap:12px;max-width:960px;margin:auto}.title h1{font-size:18px;margin:0}.pill{font-size:12px;color:var(--brand);background:var(--brand2);padding:5px 9px;border-radius:99px;font-weight:800;white-space:nowrap}
+    .searchbar{max-width:960px;margin:10px auto 0;position:relative}.searchbar input{width:100%;border:1px solid var(--line);background:#fff;border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}.searchbar .clear-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:18px;color:#667085;cursor:pointer;padding:4px 6px;display:none}.searchbar input:not(:placeholder-shown)~.clear-btn{display:block}.searchbar .clear-btn:hover{color:#344054}.stats{max-width:960px;margin:12px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 7px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--muted)}.sortbar{max-width:960px;margin:12px auto 0;display:flex;gap:8px;flex-wrap:wrap}.sortbar button{border:1px solid var(--line);background:#fff;border-radius:12px;padding:9px 12px;font-size:12px;font-weight:800;color:#344054;cursor:pointer}.sortbar button.active{background:var(--brand);border-color:var(--brand);color:#fff}.tabs{max-width:960px;margin:12px auto 0;display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 13px;white-space:nowrap;font-weight:800;color:#344054}.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .menu-btn{border:1px solid var(--line);background:#fff;border-radius:16px;padding:8px 10px;min-width:44px;height:44px;font-size:20px;font-weight:900;color:#344054;cursor:pointer}
+    .menu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:30;display:none}
+    .menu-overlay.active{display:block}
+    .menu-panel{position:fixed;top:0;left:0;width:280px;height:100vh;background:#fff;box-shadow:8px 0 24px rgba(0,0,0,.2);overflow:hidden;z-index:31;transform:translateX(-100%);transition:transform .3s ease-out}
+    .menu-panel.active{transform:translateX(0)}
+    .menu-panel button{width:100%;border:none;background:none;padding:18px 16px;text-align:left;font-size:15px;font-weight:800;color:#121826;cursor:pointer}
+    .menu-panel button:hover{background:#f2f4f7}
     main{max-width:960px;margin:12px auto;padding:0 12px 28px}.hint{color:var(--muted);font-size:12px;margin:14px 2px}
     .group-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px;padding:8px 8px 8px 10px;border-radius:14px}.group-head h2{font-size:16px;margin:0}.group-actions{display:flex;gap:6px}.mini{border:1px solid var(--line);background:#fff;border-radius:12px;padding:8px 9px;font-size:12px;font-weight:800;color:#344054}
     .team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
     .team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:#fff;border-radius:14px;padding:10px;font-weight:800;color:#344054}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 14px 14px}.sticker{min-height:58px;border:1px solid var(--line);border-radius:16px;background:#fff;padding:8px 6px;text-align:center;font-weight:950;cursor:pointer}.sticker small{display:block;margin-top:3px;font-size:10px;color:var(--muted);font-weight:750}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
-    .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:grid;grid-template-columns:repeat(7,1fr);gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
+    .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
     @media(min-width:900px){body{padding-bottom:30px}.fabbar{position:sticky;bottom:10px;margin:18px auto;transform:none;left:auto;right:auto}.grid{grid-template-columns:repeat(10,1fr)}}
     @media print{
@@ -41,8 +48,8 @@
 </head>
 <body>
   <header class="appbar">
-    <div class="title"><h1>Figurinhas Copa 2026</h1><span class="pill" id="progressPill">0%</span></div>
-    <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"></div>
+    <div class="title"><button id="menuBtn" class="menu-btn" aria-label="Menu">☰</button><h1>Figurinhas Copa 2026 v13</h1><span class="pill" id="progressPill">0%</span></div>
+    <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"><button class="clear-btn" id="clearSearch" aria-label="Limpar busca">✕</button></div>
     <div class="stats"><div class="stat"><b id="total">0</b><span>Total</span></div><div class="stat"><b id="done">0</b><span>Coladas</span></div><div class="stat"><b id="missing">0</b><span>Faltam</span></div><div class="stat"><b id="pct">0%</b><span>Progresso</span></div></div>
     <div class="sortbar"><button id="sortGroup" class="active">Grupos</button><button id="sortAlpha">Alfabética</button></div>
   </header>
@@ -52,17 +59,15 @@
   </main>
 
   <nav class="fabbar">
-    <button class="primary" id="printMissing">Imprimir<br>faltantes</button>
-    <button id="shareBtn">Compartilhar<br>link</button>
-    <button id="exportCsv">Exportar<br>CSV</button>
-    <label>Importar<br>CSV<input id="importCsv" type="file" accept=".csv,text/csv"></label>
-    <button id="expandAll">Abrir<br>todas</button>
+    <button id="expandAll">Expandir<br>todas</button>
     <button id="collapseAll">Fechar<br>todas</button>
-    <button id="moreBtn">Mais<br>ações</button>
   </nav>
+  <input id="importCsv" type="file" accept=".csv,text/csv" style="display:none">
   <section class="print-only" id="printArea"></section>
 
 <script>
+let APP_VERSION = '';
+fetch('service-worker.js').then(r=>r.text()).then(t=>{const m=t.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);if(m){const v=m[1].match(/-v(.+)$/);APP_VERSION=v?v[1]:''}});
 const n=(ini,fim)=>Array.from({length:fim-ini+1},(_,i)=>String(ini+i));
 const GRUPOS=[
   {grupo:'Grupo A',secoes:[{nome:'México',prefixo:'MEX',numeros:n(1,20)},{nome:'África do Sul',prefixo:'RSA',numeros:n(1,20)},{nome:'Coréia do Sul',prefixo:'KOR',numeros:n(1,20)},{nome:'Rep. Tcheca',prefixo:'CZE',numeros:n(1,20)}]},
@@ -233,11 +238,7 @@ function generateShareLink(){
 function shareLink(){
   const url=generateShareLink();
   if(!url)return;
-  if(navigator.share){
-    navigator.share({title:'Álbum Copa 2026',text:'Veja meu álbum de figurinhas da Copa 2026! 🏆',url:url}).catch(()=>{showShareModal(url)})
-  }else{
-    showShareModal(url);
-  }
+  showShareModal(url);
 }
 function showShareModal(url){
   const id='shareModal'+Math.random().toString(36).slice(2);
@@ -249,6 +250,26 @@ function showShareModal(url){
   $('whatsappBtn'+id).onclick=()=>{const msg='Meu álbum Copa 2026 🏆\n'+url;window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`,'_blank');container.remove()};
   $('closeBtn'+id).onclick=()=>container.remove();
 }
+function openMenu(){
+  closeMenu();
+  const overlay=document.createElement('div');
+  overlay.id='menuOverlay';
+  overlay.className='menu-overlay';
+  const panel=document.createElement('div');
+  panel.className='menu-panel';
+  panel.innerHTML=`<button id="menuShare">Compartilhar link</button><button id="menuExport">Exportar backup</button><button id="menuImport">Importar backup</button><button id="menuPrint">Imprimir</button><button id="menuClose" style="color:#667085">Cancelar</button><div style="border-top:1px solid #e5e7ef;margin-top:12px;padding-top:12px;text-align:center;font-size:11px;color:#667085">Versão ${APP_VERSION}</div>`;
+  overlay.appendChild(panel);
+  overlay.onclick=e=>{if(e.target===overlay)closeMenu()};
+  document.body.appendChild(overlay);
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{
+    $('menuShare').onclick=()=>{closeMenu();shareLink()};
+    $('menuExport').onclick=()=>{closeMenu();exportCsv()};
+    $('menuImport').onclick=()=>{closeMenu();$('importCsv').click()};
+    $('menuPrint').onclick=()=>{closeMenu();buildPrint();window.print()};
+    $('menuClose').onclick=closeMenu;
+  },0)});
+}
+function closeMenu(){const existing=$('menuOverlay');if(existing){existing.classList.remove('active');const panel=existing.querySelector('.menu-panel');if(panel)panel.classList.remove('active');setTimeout(()=>existing.remove(),300)}}
 function loadFromLink(){
   const hash=window.location.hash.substring(1);
   if(!hash.startsWith('d='))return;
@@ -272,9 +293,32 @@ function loadFromLink(){
     alert('Erro ao processar link');
   }
 }
-$('q').oninput=render;$('shareBtn').onclick=shareLink;$('exportCsv').onclick=exportCsv;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('printMissing').onclick=()=>{buildPrint();window.print()};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();$('moreBtn').onclick=()=>{const a=prompt('Digite: 1 para marcar tudo, 2 para limpar tudo');if(a==='1'){if(!confirmBatch(`Marcar todas as ${stickers.length} figurinhas?`))return;stickers.forEach(x=>setDone(x.id,true));save();render()}if(a==='2'){if(!confirmBatch('Desmarcar todas as figurinhas?'))return;state.clear();save();render()}};
+$('q').oninput=render;$('clearSearch').onclick=()=>{$('q').value='';render()};$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();
 
 loadFromLink();
+
+// PWA Installation Handler
+let deferredPrompt;
+const installPromptId='installPrompt'+Math.random().toString(36).slice(2);
+
+window.addEventListener('beforeinstallprompt', e=>{
+  e.preventDefault();
+  deferredPrompt=e;
+  showInstallPrompt();
+});
+
+function showInstallPrompt(){
+  if(!deferredPrompt)return;
+  const id=installPromptId;
+  const html=`<div id="${id}" style="position:fixed;bottom:80px;left:12px;right:12px;background:#155eef;color:#fff;border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(0,0,0,.2);z-index:25;max-width:400px;margin:0 auto"><div style="display:flex;gap:12px;align-items:center"><div style="flex:1"><div style="font-weight:700;font-size:14px;margin-bottom:4px">Instalar aplicativo</div><div style="font-size:12px;opacity:.9">Acesse seu álbum sem internet</div></div><button id="installBtn${id}" style="background:#fff;color:#155eef;border:none;border-radius:10px;padding:8px 14px;font-weight:700;cursor:pointer;font-size:12px;white-space:nowrap">Instalar</button><button id="closePromptBtn${id}" style="background:transparent;color:#fff;border:none;font-size:18px;cursor:pointer;padding:0;width:24px;height:24px;display:flex;align-items:center;justify-content:center">✕</button></div></div>`;
+  const container=document.createElement('div');
+  container.innerHTML=html;
+  document.body.appendChild(container);
+  $('installBtn'+id).onclick=async()=>{deferredPrompt.prompt();const result=await deferredPrompt.userChoice;if(result.outcome==='accepted'){console.log('App installed')}else{console.log('User dismissed')}deferredPrompt=null;container.remove()};
+  $('closePromptBtn'+id).onclick=()=>{container.remove()};
+}
+
+window.addEventListener('appinstalled',()=>{console.log('PWA installed');deferredPrompt=null});
 
 // register service worker for PWA
 if('serviceWorker' in navigator){
@@ -282,14 +326,6 @@ if('serviceWorker' in navigator){
     console.log('Service worker registered', reg);
   }).catch(err=>console.warn('Service worker failed', err));
 }
-
-// simple beforeinstallprompt handler (optional)
-let deferredPrompt;
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  // You could show a custom install button and call deferredPrompt.prompt() on click
-});
 
 render();
 </script>
