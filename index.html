@@ -48,6 +48,15 @@
     }
     .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
     .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
+    .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
+    .confirm-overlay.active{display:flex}
+    .confirm-box{background:var(--card);border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)}
+    .confirm-box h2{margin:0 0 12px;font-size:16px;font-weight:700}
+    .confirm-box p{margin:0 0 20px;font-size:13px;color:var(--muted)}
+    .confirm-btns{display:flex;gap:8px}
+    .confirm-btns button{flex:1;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px}
+    .confirm-cancel{background:var(--line);color:var(--ink)}
+    .confirm-ok{background:var(--brand);color:#fff}
     @media print{
       @page{size:A4 portrait;margin:6mm}
       body{background:white;font-size:8px;padding:0}
@@ -86,6 +95,16 @@
   </nav>
   <input id="importCsv" type="file" accept=".csv,text/csv" style="display:none">
   <section class="print-only" id="printArea"></section>
+  <div id="confirmModal" class="confirm-overlay" role="dialog" aria-modal="true">
+    <div class="confirm-box">
+      <h2 id="confirmTitle"></h2>
+      <p id="confirmMsg"></p>
+      <div class="confirm-btns">
+        <button id="confirmCancel" class="confirm-cancel">Cancelar</button>
+        <button id="confirmOk" class="confirm-ok">Confirmar</button>
+      </div>
+    </div>
+  </div>
 
 <script>
 let APP_VERSION = '';
@@ -127,7 +146,7 @@ function groupColor(grupo){const i=GRUPOS.findIndex(g=>g.grupo===grupo);return G
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...state]));updateStats();renderTabs()}
 function isDone(id){return state.has(id)}
 function setDone(id,done){done?state.add(id):state.delete(id)}
-function confirmBatch(msg){return confirm(msg||'Confirmar alteração em várias figurinhas?')}
+function showConfirmModal(title,message){return new Promise(resolve=>{const modal=$('confirmModal');$('confirmTitle').textContent=title;$('confirmMsg').textContent=message;modal.classList.add('active');function close(r){modal.classList.remove('active');document.removeEventListener('keydown',onKey);modal.onclick=null;$('confirmCancel').onclick=null;$('confirmOk').onclick=null;resolve(r)}function onKey(e){if(e.key==='Escape')close(false)}document.addEventListener('keydown',onKey);modal.onclick=e=>{if(e.target===modal)close(false)};$('confirmCancel').onclick=()=>close(false);$('confirmOk').onclick=()=>close(true)})}
 function itemMatches(x,q){return !q||norm(x.grupo).includes(q)||norm(x.secao).includes(q)||norm(x.prefixo).includes(q)||norm(x.numero).includes(q)||norm(x.id).includes(q)||norm(`${x.prefixo} ${x.numero}`).includes(q)||norm(stickerLabel(x)).includes(q)}
 function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&(filterMode==='all'||(filterMode==='missing'&&!isDone(x.id))||(filterMode==='done'&&isDone(x.id))))}
 function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredItems();return GRUPOS.flatMap(g=>g.secoes.map(sec=>({g,sec}))).filter(({g,sec})=>(activeGroup==='Todos'||g.grupo===activeGroup)&&items.some(x=>x.grupo===g.grupo&&x.secao===sec.nome)).map(({g,sec})=>`${g.grupo}|${sec.prefixo}`)}
@@ -167,8 +186,8 @@ function render(){
       const actions = document.createElement('div');
       actions.className='team-actions';
       actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-      actions.children[0].onclick = ()=>{if(!confirmBatch(`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-      actions.children[1].onclick = ()=>{if(!confirmBatch(`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
+      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
+      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
       d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
@@ -188,8 +207,8 @@ function render(){
       head.style.borderLeft=`8px solid ${groupColor(g.grupo)}`;
       head.style.background=`linear-gradient(90deg, ${groupColor(g.grupo)}18, transparent)`;
       head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2><div class="group-actions"><button class="mini" data-a="mark">Marcar</button><button class="mini" data-a="clear">Limpar</button></div>`;
-      head.querySelector('[data-a="mark"]').onclick=()=>{if(!confirmBatch(`Marcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,true));save();render()};
-      head.querySelector('[data-a="clear"]').onclick=()=>{if(!confirmBatch(`Desmarcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,false));save();render()};
+      head.querySelector('[data-a="mark"]').onclick=async ()=>{if(!await showConfirmModal('Marcar grupo',`Marcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,true));save();render()};
+      head.querySelector('[data-a="clear"]').onclick=async ()=>{if(!await showConfirmModal('Limpar grupo',`Desmarcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,false));save();render()};
       album.appendChild(head);
       const sections = g.secoes;
       sections.forEach(sec=>{
@@ -206,8 +225,8 @@ function render(){
         const actions = document.createElement('div');
         actions.className='team-actions';
         actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-        actions.children[0].onclick = ()=>{if(!confirmBatch(`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-        actions.children[1].onclick = ()=>{if(!confirmBatch(`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
+        actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
+        actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
         d.appendChild(actions);
         const grid = document.createElement('div');
         grid.className='grid';
@@ -224,7 +243,7 @@ function render(){
 function updateStats(){const done=stickers.filter(x=>isDone(x.id)).length;const pct=Math.round(done/stickers.length*100);$('total').textContent=stickers.length;$('done').textContent=done;$('missing').textContent=stickers.length-done;$('pct').textContent=pct+'%';$('progressPill').textContent=pct+'% completo';$('progressFill').style.width=pct+'%'}
 function exportCsv(){const rows=[['id','grupo','secao','prefixo','numero','colada'],...stickers.map(x=>[x.id,x.grupo,x.secao,x.prefixo,x.numero,isDone(x.id)?1:0])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='figurinhas-copa-2026.csv';a.click();URL.revokeObjectURL(a.href)}
 function parseLine(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const ch=line[i],nx=line[i+1];if(ch==='"'&&quoted&&nx==='"'){cur+='"';i++}else if(ch==='"')quoted=!quoted;else if((ch===','||ch===';')&&!quoted){out.push(cur.trim());cur=''}else cur+=ch}out.push(cur.trim());return out.map(v=>v.replace(/^"|"$/g,'').replaceAll('""','"'))}
-function importCsv(text){if(!confirmBatch('Importar CSV pode marcar ou desmarcar várias figurinhas. Continuar?'))return;const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return;const h=parseLine(lines.shift()).map(norm);const id=h.indexOf('id'),pre=h.indexOf('prefixo'),num=h.indexOf('numero'),col=h.indexOf('colada');lines.forEach(line=>{const c=parseLine(line);let sid=id>=0?c[id]:'';if(!sid&&pre>=0&&num>=0)sid=`${c[pre]}-${c[num]}`;if(!stickers.some(x=>x.id===sid))return;setDone(sid,['1','sim','s','true','x','colada','yes','y'].includes(norm(c[col])))});save();render()}
+async function importCsv(text){if(!await showConfirmModal('Importar backup','Importar CSV pode marcar ou desmarcar várias figurinhas. Continuar?'))return;const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return;const h=parseLine(lines.shift()).map(norm);const id=h.indexOf('id'),pre=h.indexOf('prefixo'),num=h.indexOf('numero'),col=h.indexOf('colada');lines.forEach(line=>{const c=parseLine(line);let sid=id>=0?c[id]:'';if(!sid&&pre>=0&&num>=0)sid=`${c[pre]}-${c[num]}`;if(!stickers.some(x=>x.id===sid))return;setDone(sid,['1','sim','s','true','x','colada','yes','y'].includes(norm(c[col])))});save();render()}
 function buildPrint(){
   const allFwcMiss = stickers.filter(x=>x.prefixo==='FWC'&&!isDone(x.id)).map(x=>stickerLabel(x));
   let fwcRendered = false;
@@ -314,7 +333,7 @@ function toggleSticker(id,label){
   render();
   showToast(wasDone?`${label} desmarcada`:`${label} colada`,()=>{setDone(id,wasDone);save();render()});
 }
-function loadFromLink(){
+async function loadFromLink(){
   const hash=window.location.hash.substring(1);
   if(!hash.startsWith('d='))return;
   const encoded=hash.substring(2);
@@ -322,7 +341,7 @@ function loadFromLink(){
     const padded=encoded.replace(/-/g,'+').replace(/_/g,'/');
     const padding=(4-(padded.length%4))%4;
     const data=JSON.parse(atob(padded+'='.repeat(padding)));
-    if(confirm('⚠️ Aviso: Carregar este link substituirá suas figurinhas locais. Deseja continuar?')){
+    if(await showConfirmModal('Carregar álbum','Carregar este link substituirá suas figurinhas locais. Deseja continuar?')){
       state.clear();
       Object.entries(data).forEach(([prefixo,numeros])=>{numeros.forEach(numero=>{state.add(`${prefixo}-${numero}`)})});
       save();
