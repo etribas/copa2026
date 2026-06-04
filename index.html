@@ -61,6 +61,9 @@
     @keyframes sticker-uncheck{0%{transform:scale(1)}35%{transform:scale(0.88)}100%{transform:scale(1)}}
     .sticker.anim-pop{animation:sticker-pop .3s ease-out}
     .sticker.anim-uncheck{animation:sticker-uncheck .22s ease-out}
+    @keyframes sticker-exit-missing{0%{opacity:1;transform:scale(1)}20%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(.85)}}
+    .sticker.anim-exit-missing{animation:sticker-exit-missing 300ms ease-out forwards;pointer-events:none}
+    @media(prefers-reduced-motion:reduce){.sticker.anim-exit-missing{animation:none;opacity:0}}
     .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
     .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
     .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
@@ -403,6 +406,21 @@ function toggleLock(){isLocked=!isLocked;localStorage.setItem('figurinhas-locked
 function toggleSticker(id,label){
   if(isLocked)return;
   const wasDone=isDone(id);
+  if(!wasDone&&filterMode==='missing'){
+    const btn=document.querySelector(`.sticker[data-id="${id}"]`);
+    if(btn){
+      setDone(id,true);
+      btn.classList.add('done');
+      const sm=btn.querySelector('small');
+      if(sm)sm.textContent='colada';
+      let settled=false;
+      const finish=()=>{if(settled)return;settled=true;save();render()};
+      showToast(`${label} colada`,()=>{settled=true;setDone(id,false);save();render()});
+      if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){finish()}
+      else{btn.classList.add('anim-exit-missing');btn.addEventListener('animationend',finish,{once:true});setTimeout(finish,400)}
+      return;
+    }
+  }
   setDone(id,!wasDone);
   save();
   render();
