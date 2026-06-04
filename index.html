@@ -52,6 +52,10 @@
       .flag.placeholder { background: var(--line); }
       .searchbar input::placeholder { color: var(--muted); }
     }
+    .appbar .title{max-height:80px;overflow:hidden;transition:max-height .28s ease,opacity .22s ease}
+    .appbar .stats{max-height:120px;overflow:hidden;transition:max-height .28s ease,opacity .22s ease,margin-top .28s ease}
+    .appbar .progress-track{max-height:20px;transition:max-height .28s ease,opacity .22s ease,margin-top .28s ease}
+    .appbar.scrolled .title,.appbar.scrolled .stats,.appbar.scrolled .progress-track{max-height:0;opacity:0;margin-top:0}
     @keyframes sticker-pop{0%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(0.93)}100%{transform:scale(1)}}
     @keyframes sticker-uncheck{0%{transform:scale(1)}35%{transform:scale(0.88)}100%{transform:scale(1)}}
     .sticker.anim-pop{animation:sticker-pop .3s ease-out}
@@ -411,6 +415,7 @@ if('serviceWorker' in navigator){
   }).catch(err=>console.warn('Service worker failed', err));
 }
 
+window.addEventListener('scroll',()=>{document.querySelector('.appbar').classList.toggle('scrolled',window.scrollY>10)},{passive:true});
 render();
 </script>
 </body>
