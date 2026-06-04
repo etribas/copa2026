@@ -46,6 +46,8 @@
       .flag.placeholder { background: var(--line); }
       .searchbar input::placeholder { color: var(--muted); }
     }
+    .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
+    .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
     @media print{
       @page{size:A4 portrait;margin:6mm}
       body{background:white;font-size:8px;padding:0}
@@ -71,6 +73,7 @@
     <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"><button class="clear-btn" id="clearSearch" aria-label="Limpar busca">✕</button></div>
     <div class="stats"><div class="stat"><b id="total">0</b><span>Total</span></div><div class="stat"><b id="done">0</b><span>Coladas</span></div><div class="stat"><b id="missing">0</b><span>Faltam</span></div><div class="stat"><b id="pct">0%</b><span>Progresso</span></div></div>
     <div class="sortbar"><button id="sortGroup" class="active">Grupos</button><button id="sortAlpha">Alfabética</button><button id="filterAll" class="active">Todas</button><button id="filterMissing">Faltantes</button><button id="filterDone">Coladas</button></div>
+    <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
   </header>
 
   <main>
@@ -218,7 +221,7 @@ function render(){
   if(!shown) album.innerHTML='<div class="empty-msg">Nenhuma figurinha encontrada.</div>';
   updateStats();
 }
-function updateStats(){const done=stickers.filter(x=>isDone(x.id)).length;const pct=Math.round(done/stickers.length*100);$('total').textContent=stickers.length;$('done').textContent=done;$('missing').textContent=stickers.length-done;$('pct').textContent=pct+'%';$('progressPill').textContent=pct+'% completo'}
+function updateStats(){const done=stickers.filter(x=>isDone(x.id)).length;const pct=Math.round(done/stickers.length*100);$('total').textContent=stickers.length;$('done').textContent=done;$('missing').textContent=stickers.length-done;$('pct').textContent=pct+'%';$('progressPill').textContent=pct+'% completo';$('progressFill').style.width=pct+'%'}
 function exportCsv(){const rows=[['id','grupo','secao','prefixo','numero','colada'],...stickers.map(x=>[x.id,x.grupo,x.secao,x.prefixo,x.numero,isDone(x.id)?1:0])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='figurinhas-copa-2026.csv';a.click();URL.revokeObjectURL(a.href)}
 function parseLine(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const ch=line[i],nx=line[i+1];if(ch==='"'&&quoted&&nx==='"'){cur+='"';i++}else if(ch==='"')quoted=!quoted;else if((ch===','||ch===';')&&!quoted){out.push(cur.trim());cur=''}else cur+=ch}out.push(cur.trim());return out.map(v=>v.replace(/^"|"$/g,'').replaceAll('""','"'))}
 function importCsv(text){if(!confirmBatch('Importar CSV pode marcar ou desmarcar várias figurinhas. Continuar?'))return;const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return;const h=parseLine(lines.shift()).map(norm);const id=h.indexOf('id'),pre=h.indexOf('prefixo'),num=h.indexOf('numero'),col=h.indexOf('colada');lines.forEach(line=>{const c=parseLine(line);let sid=id>=0?c[id]:'';if(!sid&&pre>=0&&num>=0)sid=`${c[pre]}-${c[num]}`;if(!stickers.some(x=>x.id===sid))return;setDone(sid,['1','sim','s','true','x','colada','yes','y'].includes(norm(c[col])))});save();render()}
