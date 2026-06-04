@@ -56,7 +56,7 @@
     .appbar .title{max-height:80px;overflow:hidden;transition:max-height .28s ease,opacity .22s ease}
     .appbar .stats{max-height:120px;overflow:hidden;transition:max-height .28s ease,opacity .22s ease,margin-top .28s ease}
     .appbar .progress-track{max-height:20px;transition:max-height .28s ease,opacity .22s ease,margin-top .28s ease}
-    .appbar.scrolled .title,.appbar.scrolled .stats,.appbar.scrolled .progress-track{max-height:0;opacity:0;margin-top:0}
+    .appbar.scrolled .stats,.appbar.scrolled .progress-track{max-height:0;opacity:0;margin-top:0}
     @keyframes sticker-pop{0%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(0.93)}100%{transform:scale(1)}}
     @keyframes sticker-uncheck{0%{transform:scale(1)}35%{transform:scale(0.88)}100%{transform:scale(1)}}
     .sticker.anim-pop{animation:sticker-pop .3s ease-out}
@@ -433,7 +433,7 @@ async function loadFromLink(){
     alert('Erro ao processar link');
   }
 }
-$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{$('q').value='';render()};$('shareStickerBtn').onclick=showStickerShareModal;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('fabSortToggle').onclick=()=>setSortMode(sortMode==='alpha'?'group':'alpha');$('fabSearch').onclick=()=>{$('q').value='';render();$('q').focus();$('q').scrollIntoView({behavior:'smooth',block:'center'})};renderSortButtons();$('filterAll').onclick=()=>setFilterMode('all');$('filterMissing').onclick=()=>setFilterMode('missing');$('filterDone').onclick=()=>setFilterMode('done');renderFilterButtons();
+$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showStickerShareModal;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('fabSortToggle').onclick=()=>setSortMode(sortMode==='alpha'?'group':'alpha');$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('filterAll').onclick=()=>setFilterMode('all');$('filterMissing').onclick=()=>setFilterMode('missing');$('filterDone').onclick=()=>setFilterMode('done');renderFilterButtons();
 
 loadFromLink();
 
