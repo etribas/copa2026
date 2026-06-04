@@ -52,6 +52,10 @@
       .flag.placeholder { background: var(--line); }
       .searchbar input::placeholder { color: var(--muted); }
     }
+    @keyframes sticker-pop{0%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(0.93)}100%{transform:scale(1)}}
+    @keyframes sticker-uncheck{0%{transform:scale(1)}35%{transform:scale(0.88)}100%{transform:scale(1)}}
+    .sticker.anim-pop{animation:sticker-pop .3s ease-out}
+    .sticker.anim-uncheck{animation:sticker-uncheck .22s ease-out}
     .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
     .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
     .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
@@ -199,7 +203,7 @@ function render(){
       d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
-      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -238,7 +242,7 @@ function render(){
         d.appendChild(actions);
         const grid = document.createElement('div');
         grid.className='grid';
-        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
         d.appendChild(grid);
         album.appendChild(d);
       });
@@ -346,6 +350,8 @@ function toggleSticker(id,label){
   setDone(id,!wasDone);
   save();
   render();
+  const btn=document.querySelector(`.sticker[data-id="${id}"]`);
+  if(btn){const cls=wasDone?'anim-uncheck':'anim-pop';btn.classList.add(cls);btn.addEventListener('animationend',()=>btn.classList.remove(cls),{once:true})}
   showToast(wasDone?`${label} desmarcada`:`${label} colada`,()=>{setDone(id,wasDone);save();render()});
 }
 async function loadFromLink(){
