@@ -56,7 +56,7 @@
     <div class="title"><button id="menuBtn" class="menu-btn" aria-label="Menu">☰</button><h1>Figurinhas Copa 2026</h1><span class="pill" id="progressPill">0%</span></div>
     <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"><button class="clear-btn" id="clearSearch" aria-label="Limpar busca">✕</button></div>
     <div class="stats"><div class="stat"><b id="total">0</b><span>Total</span></div><div class="stat"><b id="done">0</b><span>Coladas</span></div><div class="stat"><b id="missing">0</b><span>Faltam</span></div><div class="stat"><b id="pct">0%</b><span>Progresso</span></div></div>
-    <div class="sortbar"><button id="sortGroup" class="active">Grupos</button><button id="sortAlpha">Alfabética</button></div>
+    <div class="sortbar"><button id="sortGroup" class="active">Grupos</button><button id="sortAlpha">Alfabética</button><button id="filterAll" class="active">Todas</button><button id="filterMissing">Faltantes</button><button id="filterDone">Coladas</button></div>
   </header>
 
   <main>
@@ -100,6 +100,7 @@ const closedTeams=new Set();
 const stickers=GRUPOS.flatMap((g,ordemGrupo)=>g.secoes.flatMap((s,ordemSecao)=>s.numeros.map((numero,ordem)=>({id:`${s.prefixo}-${numero}`,grupo:g.grupo,secao:s.nome,prefixo:s.prefixo,numero,ordemGrupo,ordemSecao,ordem}))));
 let activeGroup='Todos';
 let sortMode = localStorage.getItem('figurinhas-sort-mode') || 'group';
+let filterMode = 'all';
 const $=id=>document.getElementById(id);
 const stickerLabel=x=>`${x.prefixo}${x.numero}`;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -111,11 +112,13 @@ function isDone(id){return state.has(id)}
 function setDone(id,done){done?state.add(id):state.delete(id)}
 function confirmBatch(msg){return confirm(msg||'Confirmar alteração em várias figurinhas?')}
 function itemMatches(x,q){return !q||norm(x.grupo).includes(q)||norm(x.secao).includes(q)||norm(x.prefixo).includes(q)||norm(x.numero).includes(q)||norm(x.id).includes(q)||norm(`${x.prefixo} ${x.numero}`).includes(q)||norm(stickerLabel(x)).includes(q)}
-function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q))}
+function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&(filterMode==='all'||(filterMode==='missing'&&!isDone(x.id))||(filterMode==='done'&&isDone(x.id))))}
 function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredItems();return GRUPOS.flatMap(g=>g.secoes.map(sec=>({g,sec}))).filter(({g,sec})=>(activeGroup==='Todos'||g.grupo===activeGroup)&&items.some(x=>x.grupo===g.grupo&&x.secao===sec.nome)).map(({g,sec})=>`${g.grupo}|${sec.prefixo}`)}
 function renderTabs(){const tabsEl=$('tabs');if(!tabsEl)return;const tabs=['Todos',...GRUPOS.map(g=>g.grupo)];tabsEl.innerHTML=tabs.map(t=>`<button class="tab ${t===activeGroup?'active':''}" data-g="${esc(t)}">${esc(t)}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeGroup=b.dataset.g;render();window.scrollTo({top:0,behavior:'smooth'})})}
 function renderSortButtons(){if(!$('sortGroup'))return;$('sortGroup').classList.toggle('active',sortMode==='group');$('sortAlpha').classList.toggle('active',sortMode==='alpha')}
 function setSortMode(mode){sortMode=mode;localStorage.setItem('figurinhas-sort-mode',mode);renderSortButtons();render()}
+function renderFilterButtons(){$('filterAll').classList.toggle('active',filterMode==='all');$('filterMissing').classList.toggle('active',filterMode==='missing');$('filterDone').classList.toggle('active',filterMode==='done')}
+function setFilterMode(mode){filterMode=mode;renderFilterButtons();render()}
 function syncSectionState(){document.querySelectorAll('details.team').forEach(d=>{const key=d.dataset.key;if(openTeams.has(key)||closedTeams.has(key))return;if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}})}
 function isTeamOpen(key, grupo, q){return closedTeams.has(key)?false:openTeams.has(key)||!!q||activeGroup!=='Todos'||grupo==='Página inicial'}
 function render(){
@@ -317,7 +320,7 @@ function loadFromLink(){
     alert('Erro ao processar link');
   }
 }
-$('q').oninput=render;$('clearSearch').onclick=()=>{$('q').value='';render()};$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();
+$('q').oninput=render;$('clearSearch').onclick=()=>{$('q').value='';render()};$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{const keys=allVisibleTeamKeys();keys.forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('sortGroup').onclick=()=>setSortMode('group');$('sortAlpha').onclick=()=>setSortMode('alpha');renderSortButtons();$('filterAll').onclick=()=>setFilterMode('all');$('filterMissing').onclick=()=>setFilterMode('missing');$('filterDone').onclick=()=>setFilterMode('done');renderFilterButtons();
 
 loadFromLink();
 
