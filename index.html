@@ -27,6 +27,11 @@
     .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:6px}.fabbar button,.fabbar label{border:1px solid var(--line);background:#fff;border-radius:16px;padding:9px 4px;min-height:54px;font-size:11px;font-weight:900;text-align:center;cursor:pointer}.fabbar .primary{background:var(--brand);color:#fff;border-color:var(--brand)}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
     @media(min-width:900px){body{padding-bottom:30px}.fabbar{position:sticky;bottom:10px;margin:18px auto;transform:none;left:auto;right:auto}.grid{grid-template-columns:repeat(10,1fr)}}
+    .toast{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%) translateY(20px);background:#1a1f2e;color:#fff;border-radius:16px;padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:200;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;max-width:calc(100vw - 32px)}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0);pointer-events:auto}
+    .toast-undo{background:none;border:1px solid rgba(255,255,255,.35);border-radius:10px;color:#fff;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;flex-shrink:0}
+    .toast-undo:hover{background:rgba(255,255,255,.15)}
+    @media(min-width:900px){.toast{bottom:calc(90px + env(safe-area-inset-bottom,0px))}}
     @media print{
       @page{size:A4 portrait;margin:6mm}
       body{background:white;font-size:8px;padding:0}
@@ -147,7 +152,7 @@ function render(){
       d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
-      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>{setDone(x.id,!isDone(x.id));save();render()};grid.appendChild(b)});
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -186,7 +191,7 @@ function render(){
         d.appendChild(actions);
         const grid = document.createElement('div');
         grid.className='grid';
-        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>{setDone(x.id,!isDone(x.id));save();render()};grid.appendChild(b)});
+        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
         d.appendChild(grid);
         album.appendChild(d);
       });
@@ -270,6 +275,25 @@ function openMenu(){
   },0)});
 }
 function closeMenu(){const existing=$('menuOverlay');if(existing){existing.classList.remove('active');const panel=existing.querySelector('.menu-panel');if(panel)panel.classList.remove('active');setTimeout(()=>existing.remove(),300)}}
+let _toastTimer=null;
+function showToast(msg,undoFn){
+  let el=document.querySelector('.toast');
+  if(el){clearTimeout(_toastTimer);el.remove()}
+  el=document.createElement('div');
+  el.className='toast';
+  el.innerHTML=`<span>${msg}</span>${undoFn?`<button class="toast-undo">Desfazer</button>`:''}`;
+  document.body.appendChild(el);
+  if(undoFn)el.querySelector('.toast-undo').onclick=()=>{undoFn();el.remove();clearTimeout(_toastTimer)};
+  requestAnimationFrame(()=>el.classList.add('show'));
+  _toastTimer=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),220)},4000);
+}
+function toggleSticker(id,label){
+  const wasDone=isDone(id);
+  setDone(id,!wasDone);
+  save();
+  render();
+  showToast(wasDone?`${label} desmarcada`:`${label} colada`,()=>{setDone(id,wasDone);save();render()});
+}
 function loadFromLink(){
   const hash=window.location.hash.substring(1);
   if(!hash.startsWith('d='))return;
