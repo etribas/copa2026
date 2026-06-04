@@ -162,15 +162,26 @@ const FLAGS={MEX:'mx',RSA:'za',KOR:'kr',CZE:'cz',CAN:'ca',BIH:'ba',QAT:'qa',SUI:
 const FLAG_EMOJIS={MEX:'🇲🇽',RSA:'🇿🇦',KOR:'🇰🇷',CZE:'🇨🇿',CAN:'🇨🇦',BIH:'🇧🇦',QAT:'🇶🇦',SUI:'🇨🇭',BRA:'🇧🇷',MAR:'🇲🇦',HAI:'🇭🇹',SCO:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',USA:'🇺🇸',PAR:'🇵🇾',AUS:'🇦🇺',TUR:'🇹🇷',GER:'🇩🇪',CUW:'🇨🇼',CIV:'🇨🇮',ECU:'🇪🇨',NED:'🇳🇱',JPN:'🇯🇵',SWE:'🇸🇪',TUN:'🇹🇳',BEL:'🇧🇪',EGY:'🇪🇬',IRN:'🇮🇷',NZL:'🇳🇿',ESP:'🇪🇸',CPV:'🇨🇻',KSA:'🇸🇦',URU:'🇺🇾',FRA:'🇫🇷',SEN:'🇸🇳',IRQ:'🇮🇶',NOR:'🇳🇴',ARG:'🇦🇷',ALG:'🇩🇿',AUT:'🇦🇹',JOR:'🇯🇴',POR:'🇵🇹',COD:'🇨🇩',UZB:'🇺🇿',COL:'🇨🇴',ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',CRO:'🇭🇷',GHA:'🇬🇭',PAN:'🇵🇦',FWC:'⭐',CC:''}
 const GROUP_COLORS=['#155eef','#7a5af8','#dd2590','#eaaa08','#12b76a','#06aed4','#f79009','#f04438','#6172f3','#9e77ed','#17b26a','#2e90fa','#667085','#344054'];
 const STORAGE_KEY='figurinhas-copa-2026-mobile-v4';
+const FILTER_KEY='figurinhas-filter-mode';
+const GROUP_KEY='figurinhas-active-group';
+const SCROLL_KEY='figurinhas-scroll-y';
+const OPEN_TEAMS_KEY='figurinhas-open-teams';
+const CLOSED_TEAMS_KEY='figurinhas-closed-teams';
+function lsGet(k,def){try{const v=localStorage.getItem(k);return v!==null?v:def}catch(e){return def}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+function lsGetJson(k,def){try{return JSON.parse(lsGet(k,null))??def}catch(e){return def}}
 const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const state=new Set(saved);
-const openTeams=new Set();
-const closedTeams=new Set();
+const openTeams=new Set(lsGetJson(OPEN_TEAMS_KEY,[]));
+const closedTeams=new Set(lsGetJson(CLOSED_TEAMS_KEY,[]));
 const stickers=GRUPOS.flatMap((g,ordemGrupo)=>g.secoes.flatMap((s,ordemSecao)=>s.numeros.map((numero,ordem)=>({id:`${s.prefixo}-${numero}`,grupo:g.grupo,secao:s.nome,prefixo:s.prefixo,numero,ordemGrupo,ordemSecao,ordem}))));
-let activeGroup='Todos';
+const _validGroups=new Set(['Todos',...GRUPOS.map(g=>g.grupo)]);
+const _sg=lsGet(GROUP_KEY,'Todos');
+let activeGroup=_validGroups.has(_sg)?_sg:'Todos';
 let sortMode = localStorage.getItem('figurinhas-sort-mode') || 'group';
 let isLocked = localStorage.getItem('figurinhas-locked') === '1';
-let filterMode = 'all';
+const _sf=lsGet(FILTER_KEY,'all');
+let filterMode=['all','done','missing'].includes(_sf)?_sf:'all';
 const $=id=>document.getElementById(id);
 const stickerLabel=x=>`${x.prefixo}${x.numero}`;
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
@@ -178,6 +189,7 @@ function norm(v){return String(v||'').trim().toLowerCase().normalize('NFD').repl
 function flagHtml(prefixo){const code=FLAGS[prefixo];return code?`<img class="flag" src="https://flagcdn.com/${code}.svg" alt="Bandeira ${prefixo}" loading="lazy">`:`<span class="flag placeholder">★</span>`}
 function groupColor(grupo){const i=GRUPOS.findIndex(g=>g.grupo===grupo);return GROUP_COLORS[Math.max(0,i)%GROUP_COLORS.length]}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...state]));updateStats();renderTabs()}
+function saveExpandState(){lsSet(OPEN_TEAMS_KEY,JSON.stringify([...openTeams]));lsSet(CLOSED_TEAMS_KEY,JSON.stringify([...closedTeams]))}
 function isDone(id){return state.has(id)}
 function setDone(id,done){done?state.add(id):state.delete(id)}
 function showConfirmModal(title,message){return new Promise(resolve=>{const modal=$('confirmModal');$('confirmTitle').textContent=title;$('confirmMsg').textContent=message;modal.classList.add('active');function close(r){modal.classList.remove('active');document.removeEventListener('keydown',onKey);modal.onclick=null;$('confirmCancel').onclick=null;$('confirmOk').onclick=null;resolve(r)}function onKey(e){if(e.key==='Escape')close(false)}document.addEventListener('keydown',onKey);modal.onclick=e=>{if(e.target===modal)close(false)};$('confirmCancel').onclick=()=>close(false);$('confirmOk').onclick=()=>close(true)})}
@@ -186,11 +198,11 @@ function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(a
 function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredItems();return GRUPOS.flatMap(g=>g.secoes.map(sec=>({g,sec}))).filter(({g,sec})=>(activeGroup==='Todos'||g.grupo===activeGroup)&&items.some(x=>x.grupo===g.grupo&&x.secao===sec.nome)).map(({g,sec})=>`${g.grupo}|${sec.prefixo}`)}
 function allTeamKeys(){return GRUPOS.flatMap(g=>g.secoes.map(sec=>`${g.grupo}|${sec.prefixo}`))}
 
-function renderTabs(){const tabsEl=$('tabs');if(!tabsEl)return;const tabs=['Todos',...GRUPOS.map(g=>g.grupo)];tabsEl.innerHTML=tabs.map(t=>`<button class="tab ${t===activeGroup?'active':''}" data-g="${esc(t)}">${esc(t)}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeGroup=b.dataset.g;render();window.scrollTo({top:0,behavior:'smooth'})})}
+function renderTabs(){const tabsEl=$('tabs');if(!tabsEl)return;const tabs=['Todos',...GRUPOS.map(g=>g.grupo)];tabsEl.innerHTML=tabs.map(t=>`<button class="tab ${t===activeGroup?'active':''}" data-g="${esc(t)}">${esc(t)}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeGroup=b.dataset.g;lsSet(GROUP_KEY,activeGroup);render();window.scrollTo({top:0,behavior:'smooth'})})}
 function renderSortButtons(){const btn=$('fabSortToggle');if(!btn)return;btn.classList.toggle('active',sortMode==='alpha');btn.setAttribute('aria-pressed',sortMode==='alpha'?'true':'false')}
 function setSortMode(mode){sortMode=mode;localStorage.setItem('figurinhas-sort-mode',mode);renderSortButtons();render()}
 function renderFilterButtons(){$('statAll').classList.toggle('active',filterMode==='all');$('statDone').classList.toggle('active',filterMode==='done');$('statMissing').classList.toggle('active',filterMode==='missing')}
-function setFilterMode(mode){filterMode=mode;renderFilterButtons();render()}
+function setFilterMode(mode){filterMode=mode;lsSet(FILTER_KEY,mode);renderFilterButtons();render()}
 function syncSectionState(){document.querySelectorAll('details.team').forEach(d=>{const key=d.dataset.key;if(openTeams.has(key)||closedTeams.has(key))return;if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}})}
 function isTeamOpen(key, grupo, q){return closedTeams.has(key)?false:openTeams.has(key)||!!q||activeGroup!=='Todos'||grupo==='Página inicial'}
 function render(){
@@ -217,7 +229,7 @@ function render(){
       d.className='team';
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
-      d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}};
+      d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
       const actions = document.createElement('div');
       actions.className='team-actions';
@@ -256,7 +268,7 @@ function render(){
         d.className='team';
         d.dataset.key=key;
         d.open = isTeamOpen(key, g.grupo, q);
-        d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}};
+        d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
         d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
         const actions = document.createElement('div');
         actions.className='team-actions';
@@ -448,7 +460,7 @@ async function loadFromLink(){
     alert('Erro ao processar link');
   }
 }
-$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showStickerShareModal;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});render()};$('fabSortToggle').onclick=()=>setSortMode(sortMode==='alpha'?'group':'alpha');$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
+$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showStickerShareModal;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=()=>setSortMode(sortMode==='alpha'?'group':'alpha');$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
 
 loadFromLink();
 
@@ -482,7 +494,11 @@ if('serviceWorker' in navigator){
   }).catch(err=>console.warn('Service worker failed', err));
 }
 
+let _scrollTimer=null;
+window.addEventListener('scroll',()=>{if(_scrollTimer)clearTimeout(_scrollTimer);_scrollTimer=setTimeout(()=>lsSet(SCROLL_KEY,String(Math.round(window.scrollY))),200)},{passive:true});
+
 render();
+(function(){const y=parseInt(lsGet(SCROLL_KEY,'0'),10)||0;if(!y)return;requestAnimationFrame(()=>requestAnimationFrame(()=>{const max=document.documentElement.scrollHeight-window.innerHeight;if(y<=max)window.scrollTo({top:y,behavior:'instant'})}))})();
 </script>
 </body>
 </html>
