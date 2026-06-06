@@ -104,6 +104,8 @@
     html[data-theme="light"] .badge{background:#f2f4f7;color:#344054}
     html[data-theme="light"] .sticker.done{background:#eaf8ef;border-color:#a6dcb8}
     html[data-theme="light"] .flag.placeholder{background:#f2f4f7}
+    #fabSortToggle{flex-direction:column;gap:1px;padding:6px}
+    .sort-label{font-size:9px;font-weight:700;line-height:1;white-space:nowrap;text-align:center}
   </style>
   <script>(function(){var t=localStorage.getItem('figurinhas-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
 </head>
@@ -123,7 +125,7 @@
     <button id="fabSearch" aria-label="Buscar figurinha"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
     <button id="expandAll" aria-label="Expandir todas as seções"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 9 12 14 17 9"/><polyline points="7 15 12 20 17 15"/></svg></button>
     <button id="collapseAll" aria-label="Fechar todas as seções"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 15 12 10 17 15"/><polyline points="7 9 12 4 17 9"/></svg></button>
-    <button id="fabSortToggle" class="fab-az" aria-label="Alternar ordenação alfabética" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="12" x2="10" y2="12"/><line x1="2" y1="18" x2="6" y2="18"/><path d="M17 4 L17 20 M14 17 L17 20 L20 17"/></svg></button>
+    <button id="fabSortToggle" aria-label="Ordenação" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="12" x2="10" y2="12"/><line x1="2" y1="18" x2="6" y2="18"/><path d="M17 4 L17 20 M14 17 L17 20 L20 17"/></svg><span class="sort-label" id="fabSortLabel">Grupos</span></button>
   </nav>
   <input id="importCsv" type="file" accept=".csv,text/csv" style="display:none">
   <section class="print-only" id="printArea"></section>
@@ -202,8 +204,34 @@ function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredIte
 function allTeamKeys(){return GRUPOS.flatMap(g=>g.secoes.map(sec=>`${g.grupo}|${sec.prefixo}`))}
 
 function renderTabs(){const tabsEl=$('tabs');if(!tabsEl)return;const tabs=['Todos',...GRUPOS.map(g=>g.grupo)];tabsEl.innerHTML=tabs.map(t=>`<button class="tab ${t===activeGroup?'active':''}" data-g="${esc(t)}">${esc(t)}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeGroup=b.dataset.g;lsSet(GROUP_KEY,activeGroup);render();window.scrollTo({top:0,behavior:'smooth'})})}
-function renderSortButtons(){const btn=$('fabSortToggle');if(!btn)return;btn.classList.toggle('active',sortMode==='alpha');btn.setAttribute('aria-pressed',sortMode==='alpha'?'true':'false')}
+function renderSortButtons(){const btn=$('fabSortToggle');if(!btn)return;const labels={'group':'Grupos','alpha':'A-Z','missing-desc':'+Falt.','missing-asc':'-Falt.'};const lbl=$('fabSortLabel');if(lbl)lbl.textContent=labels[sortMode]||'Grupos';btn.classList.toggle('active',sortMode!=='group');btn.setAttribute('aria-pressed',sortMode!=='group'?'true':'false')}
 function setSortMode(mode){sortMode=mode;localStorage.setItem('figurinhas-sort-mode',mode);renderSortButtons();render()}
+function openSortMenu(){
+  const SORTS=[
+    {id:'group',label:'Por grupos',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>'},
+    {id:'alpha',label:'Alfabética',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="12" x2="10" y2="12"/><line x1="2" y1="18" x2="6" y2="18"/><path d="M17 4 L17 20 M14 17 L17 20 L20 17"/></svg>'},
+    {id:'missing-desc',label:'Times com mais figurinhas faltantes',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 16l4 4 4-4"/><path d="M7 20V4"/><path d="M11 4h10"/><path d="M11 8h7"/><path d="M11 12h4"/></svg>'},
+    {id:'missing-asc',label:'Times com menos figurinhas faltantes',icon:'<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 8l4-4 4 4"/><path d="M7 4v16"/><path d="M11 12h10"/><path d="M11 16h7"/><path d="M11 20h4"/></svg>'}
+  ];
+  const CHECK='<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#155eef" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+  const overlay=document.createElement('div');
+  overlay.id='sortMenuOverlay';
+  overlay.className='menu-overlay';
+  const panel=document.createElement('div');
+  panel.className='menu-panel';
+  panel.setAttribute('role','dialog');
+  panel.setAttribute('aria-modal','true');
+  panel.setAttribute('aria-label','Ordenação');
+  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Ordenação</div><ul class="menu-sheet-list">${SORTS.map(s=>`<li><button class="menu-sheet-item" data-sort="${s.id}">${s.icon}<span style="flex:1">${s.label}</span>${sortMode===s.id?CHECK:''}</button></li>`).join('')}</ul>`;
+  overlay.appendChild(panel);
+  const onKeydown=e=>{if(e.key==='Escape')close()};
+  overlay._onKeydown=onKeydown;
+  document.addEventListener('keydown',onKeydown);
+  overlay.onclick=e=>{if(e.target===overlay)close()};
+  document.body.appendChild(overlay);
+  function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{panel.querySelectorAll('[data-sort]').forEach(btn=>{btn.onclick=()=>{close();setSortMode(btn.dataset.sort)}})},0)});
+}
 function renderFilterButtons(){$('statAll').classList.toggle('active',filterMode==='all');$('statDone').classList.toggle('active',filterMode==='done');$('statMissing').classList.toggle('active',filterMode==='missing')}
 function setFilterMode(mode){filterMode=mode;lsSet(FILTER_KEY,mode);renderFilterButtons();render()}
 function syncSectionState(){document.querySelectorAll('details.team').forEach(d=>{const key=d.dataset.key;if(openTeams.has(key)||closedTeams.has(key))return;if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}})}
@@ -222,6 +250,38 @@ function render(){
       .flatMap(g=>g.secoes.map(sec=>({grupo:g.grupo,sec})))
       .sort((a,b)=>a.sec.nome.localeCompare(b.sec.nome,'pt',{sensitivity:'base'}));
 
+    sections.forEach(({grupo,sec})=>{
+      const teamItems = itemsNow.filter(x=>x.secao===sec.nome);
+      if(!teamItems.length) return;
+      shown += teamItems.length;
+      const col = teamItems.filter(x=>isDone(x.id)).length;
+      const key = `${grupo}|${sec.prefixo}`;
+      const d = document.createElement('details');
+      d.className='team';
+      d.dataset.key=key;
+      d.open = isTeamOpen(key, grupo, q);
+      d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
+      const actions = document.createElement('div');
+      actions.className='team-actions';
+      actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
+      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
+      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
+      d.appendChild(actions);
+      const grid = document.createElement('div');
+      grid.className='grid';
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      d.appendChild(grid);
+      album.appendChild(d);
+    });
+  } else if(sortMode==='missing-desc'||sortMode==='missing-asc'){
+    const sections = GRUPOS.filter(g=>activeGroup==='Todos'||g.grupo===activeGroup)
+      .flatMap(g=>g.secoes.map(sec=>({grupo:g.grupo,sec})));
+    sections.sort((a,b)=>{
+      const mA=itemsNow.filter(x=>x.secao===a.sec.nome&&!isDone(x.id)).length;
+      const mB=itemsNow.filter(x=>x.secao===b.sec.nome&&!isDone(x.id)).length;
+      return sortMode==='missing-desc'?mB-mA:mA-mB;
+    });
     sections.forEach(({grupo,sec})=>{
       const teamItems = itemsNow.filter(x=>x.secao===sec.nome);
       if(!teamItems.length) return;
@@ -507,7 +567,7 @@ function _showAppLinkModal(url){
   document.getElementById('clsalm'+id).onclick=()=>container.remove();
   document.getElementById(id).onclick=e=>{if(e.target===document.getElementById(id))container.remove()};
 }
-$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=()=>setSortMode(sortMode==='alpha'?'group':'alpha');$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
+$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
 
 loadFromLink();
 
