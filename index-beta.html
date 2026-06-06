@@ -220,6 +220,63 @@
 
 <script>
 
+// ─── Gesto de arrastar para baixo para fechar menus ──────────────────────────
+function addDragToClose(panel, closeFn) {
+  let startY = 0, currentY = 0, dragging = false;
+  const THRESHOLD = 80; // px para confirmar fechamento
+
+  function onTouchStart(e) {
+    // Só inicia se o toque começou na área do handle ou no topo do panel
+    // e o painel não está rolado para baixo
+    if (panel.scrollTop > 0) return;
+    startY = e.touches[0].clientY;
+    currentY = startY;
+    dragging = true;
+    // Remove transição durante o drag para movimento fluido
+    panel.style.transition = 'none';
+  }
+
+  function onTouchMove(e) {
+    if (!dragging) return;
+    currentY = e.touches[0].clientY;
+    const deltaY = currentY - startY;
+    if (deltaY < 0) {
+      // Não permite arrastar para cima
+      panel.style.transform = 'translateY(0)';
+      return;
+    }
+    // Se o painel estiver rolado, não inicia o drag
+    if (panel.scrollTop > 0) {
+      dragging = false;
+      panel.style.transform = 'translateY(0)';
+      return;
+    }
+    e.preventDefault();
+    panel.style.transform = `translateY(${deltaY}px)`;
+  }
+
+  function onTouchEnd() {
+    if (!dragging) return;
+    dragging = false;
+    const deltaY = currentY - startY;
+    // Restaura transição
+    panel.style.transition = '';
+    if (deltaY >= THRESHOLD) {
+      // Deslizou o suficiente: fecha
+      panel.style.transform = 'translateY(100%)';
+      setTimeout(closeFn, 300);
+    } else {
+      // Não deslizou o suficiente: volta ao lugar
+      panel.style.transform = 'translateY(0)';
+    }
+  }
+
+  panel.addEventListener('touchstart', onTouchStart, { passive: true });
+  panel.addEventListener('touchmove', onTouchMove, { passive: false });
+  panel.addEventListener('touchend', onTouchEnd, { passive: true });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 let APP_VERSION = '';
 
 fetch('service-worker.js').then(r=>r.text()).then(t=>{const m=t.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);if(m){const v=m[1].match(/-v(.+)$/);APP_VERSION=v?v[1].replace(/-/g,'.'):''}});
@@ -331,7 +388,7 @@ function openSortMenu(){
   overlay.onclick=e=>{if(e.target===overlay)close()};
   document.body.appendChild(overlay);
   function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
-  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{panel.querySelectorAll('[data-sort]').forEach(btn=>{btn.onclick=()=>{close();setSortMode(btn.dataset.sort)}})},0)});
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');addDragToClose(panel,close);setTimeout(()=>{panel.querySelectorAll('[data-sort]').forEach(btn=>{btn.onclick=()=>{close();setSortMode(btn.dataset.sort)}})},0)});
 }
 
 function renderFilterButtons(){$('statAll').classList.toggle('active',filterMode==='all');$('statDone').classList.toggle('active',filterMode==='done');$('statMissing').classList.toggle('active',filterMode==='missing')}
@@ -544,7 +601,7 @@ function showThemePicker(){
   overlay.onclick=e=>{if(e.target===overlay)closeTP()};
   document.body.appendChild(overlay);
   function closeTP(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
-  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{THEMES.forEach(t=>{const btn=document.getElementById('_tp_'+t.id);if(btn)btn.onclick=()=>{closeTP();applyTheme(t.id);showToast(MSGS[t.id])}})},0)});
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');addDragToClose(panel,closeTP);setTimeout(()=>{THEMES.forEach(t=>{const btn=document.getElementById('_tp_'+t.id);if(btn)btn.onclick=()=>{closeTP();applyTheme(t.id);showToast(MSGS[t.id])}})},0)});
 }
 
 // ─── NOVO: showSettingsMenu ───────────────────────────────────────────────────
@@ -601,6 +658,7 @@ function showSettingsMenu(){
   requestAnimationFrame(()=>{
     overlay.classList.add('active');
     panel.classList.add('active');
+    addDragToClose(panel,closeCfg);
 
     // Atualiza versão caso APP_VERSION ainda esteja carregando
     setTimeout(()=>{
@@ -641,7 +699,7 @@ function openMenu(){
   document.addEventListener('keydown',onKeydown);
   overlay.onclick=e=>{if(e.target===overlay)closeMenu()};
   document.body.appendChild(overlay);
-  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');addDragToClose(panel,closeMenu);setTimeout(()=>{
     $('menuExport').onclick=()=>{closeMenu();exportCsv()};
     $('menuImport').onclick=()=>{closeMenu();$('importCsv').click()};
     $('menuPrint').onclick=()=>{closeMenu();buildPrint();window.print()};
@@ -745,7 +803,7 @@ function showShareMenu(){
   overlay.onclick=e=>{if(e.target===overlay)close()};
   document.body.appendChild(overlay);
   function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
-  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{
+  requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');addDragToClose(panel,close);setTimeout(()=>{
     document.getElementById('_sm_app').onclick=()=>{close();shareApp()};
     document.getElementById('_sm_link').onclick=()=>{close();shareLink()};
     document.getElementById('_sm_miss').onclick=()=>{close();showStickerShareModal('missing')};
