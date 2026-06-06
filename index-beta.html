@@ -45,24 +45,15 @@
 
 .menu-sheet-footer{border-top:1px solid var(--line);padding:12px 16px;text-align:center;font-size:11px;color:var(--muted)}
 
+.menu-sheet-info{display:flex;align-items:center;gap:14px;padding:16px 12px;font-size:13px;color:var(--muted);border-radius:14px}
+
+.menu-sheet-info svg{flex-shrink:0}
+
     main{max-width:960px;margin:12px auto;padding:0 12px 28px}.hint{color:var(--muted);font-size:12px;margin:14px 2px}
 
 .group-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px;padding:8px 8px 8px 10px;border-radius:14px}.group-head h2{font-size:16px;margin:0}.group-actions{display:flex;gap:6px}.mini{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 9px;font-size:12px;font-weight:800;color:var(--ink)}
 
-.team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}
-
-/* ── summary com barra de progresso integrada ── */
-.team summary{list-style:none;cursor:pointer;padding:14px 14px 0 14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}
-.team summary::-webkit-details-marker{display:none}
-.team-summary-inner{display:flex;flex-direction:column;width:100%;gap:0}
-.team-summary-top{display:flex;justify-content:space-between;align-items:center;gap:8px;padding-bottom:10px}
-.team-progress-row{padding-bottom:10px}
-.team-progress-track{height:3px;background:var(--line);border-radius:2px;overflow:hidden}
-.team-progress-fill{height:100%;border-radius:2px;background:var(--muted);opacity:.5;transition:width .4s ease}
-.team-progress-fill.complete{background:var(--muted);opacity:.75}
-/* ── fim barra de progresso ── */
-
-.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
 
 .team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;font-weight:800;color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 14px 14px}.sticker{min-height:58px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:8px 6px;text-align:center;font-weight:950;cursor:pointer}.sticker small{display:block;margin-top:3px;font-size:10px;color:var(--muted);font-weight:750}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
 
@@ -97,27 +88,45 @@
 }
 
     @keyframes sticker-pop{0%{transform:scale(1)}40%{transform:scale(1.18)}70%{transform:scale(0.93)}100%{transform:scale(1)}}
+
     @keyframes sticker-uncheck{0%{transform:scale(1)}35%{transform:scale(0.88)}100%{transform:scale(1)}}
+
 .sticker.anim-pop{animation:sticker-pop .3s ease-out}
+
 .sticker.anim-uncheck{animation:sticker-uncheck .22s ease-out}
+
     @keyframes sticker-exit-missing{0%{opacity:1;transform:scale(1)}20%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(.85)}}
+
 .sticker.anim-exit-missing{animation:sticker-exit-missing 300ms ease-out forwards;pointer-events:none}
+
     @media(prefers-reduced-motion:reduce){.sticker.anim-exit-missing{animation:none;opacity:0}}
+
     @keyframes sticker-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+
 .sticker.anim-shake{animation:sticker-shake .35s ease-out}
+
     @media(prefers-reduced-motion:reduce){.sticker.anim-shake{animation:none}}
 
 .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
+
 .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
 
 .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
+
 .confirm-overlay.active{display:flex}
+
 .confirm-box{background:var(--card);border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)}
+
 .confirm-box h2{margin:0 0 12px;font-size:16px;font-weight:700}
+
 .confirm-box p{margin:0 0 20px;font-size:13px;color:var(--muted)}
+
 .confirm-btns{display:flex;gap:8px}
+
 .confirm-btns button{flex:1;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px}
+
 .confirm-cancel{background:var(--line);color:var(--ink)}
+
 .confirm-ok{background:var(--brand);color:#fff}
 
     @media print{
@@ -139,29 +148,46 @@
 }
 
     html[data-theme="dark"]{color-scheme:dark;--bg:#0f1117;--card:#1a1f2e;--ink:#e8ecf4;--muted:#8895b3;--line:#2a3047;--brand2:#1a2a4a;--ok:#34d47e;--shadow:0 8px 24px rgba(0,0,0,.3)}
+
     html[data-theme="dark"] .appbar{background:rgba(15,17,23,.96)}
+
     html[data-theme="dark"] .fabbar{background:rgba(26,31,46,.96)}
+
     html[data-theme="dark"] .badge{background:var(--line);color:var(--ink)}
+
     html[data-theme="dark"] .sticker.done{background:#0d2b1a;border-color:#1d5c35}
+
     html[data-theme="dark"] .flag.placeholder{background:var(--line)}
+
     html[data-theme="dark"] .searchbar input::placeholder{color:var(--muted)}
+
     html[data-theme="light"]{color-scheme:light;--bg:#f5f7fb;--card:#fff;--ink:#121826;--muted:#667085;--line:#e5e7ef;--ok:#128a46;--brand:#155eef;--brand2:#eff4ff;--shadow:0 8px 24px rgba(16,24,40,.08)}
+
     html[data-theme="light"] .appbar{background:rgba(245,247,251,.96)}
+
     html[data-theme="light"] .fabbar{background:rgba(255,255,255,.96)}
+
     html[data-theme="light"] .badge{background:#f2f4f7;color:#344054}
+
     html[data-theme="light"] .sticker.done{background:#eaf8ef;border-color:#a6dcb8}
+
     html[data-theme="light"] .flag.placeholder{background:#f2f4f7}
 
     #fabSortToggle{flex-direction:column;gap:1px;padding:6px}
+
 .sort-label{font-size:9px;font-weight:700;line-height:1;white-space:nowrap;text-align:center}
+
   </style>
   <script>(function(){var t=localStorage.getItem('figurinhas-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
 </head>
 <body>
   <header class="appbar">
     <div class="title"><h1>Figurinhas Copa 2026</h1><button id="shareStickerBtn" class="menu-btn" aria-label="Compartilhar figurinhas" style="margin-left:auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button><button id="lockBtn" class="menu-btn" aria-label="Bloquear edição"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button><button id="menuBtn" class="menu-btn" aria-label="Mais ações"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+
     <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"><button class="clear-btn" id="clearSearch" aria-label="Limpar busca">✕</button></div>
+
     <div class="stats"><div class="stat active" id="statAll"><b id="total">0</b><span>Total</span></div><div class="stat" id="statDone"><b id="done">0</b><span>Coladas</span></div><div class="stat" id="statMissing"><b id="missing">0</b><span>Faltam</span></div><div class="stat" id="statPct"><b id="pct">0%</b><span>Progresso</span></div></div>
+
     <div class="progress-track"><div id="progressFill" class="progress-fill"></div></div>
   </header>
   <main>
@@ -169,12 +195,18 @@
   </main>
   <nav class="fabbar">
     <button id="fabSearch" aria-label="Buscar figurinha"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></button>
+
     <button id="expandAll" aria-label="Expandir todas as seções"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 9 12 14 17 9"/><polyline points="7 15 12 20 17 15"/></svg></button>
+
     <button id="collapseAll" aria-label="Fechar todas as seções"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 15 12 10 17 15"/><polyline points="7 9 12 4 17 9"/></svg></button>
+
     <button id="fabSortToggle" aria-label="Ordenação" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="12" x2="10" y2="12"/><line x1="2" y1="18" x2="6" y2="18"/><path d="M17 4 L17 20 M14 17 L17 20 L20 17"/></svg><span class="sort-label" id="fabSortLabel">Grupos</span></button>
   </nav>
+
   <input id="importCsv" type="file" accept=".csv,text/csv" style="display:none">
+
   <section class="print-only" id="printArea"></section>
+
   <div id="confirmModal" class="confirm-overlay" role="dialog" aria-modal="true">
     <div class="confirm-box">
       <h2 id="confirmTitle"></h2>
@@ -187,15 +219,21 @@
   </div>
 
 <script>
+
 let APP_VERSION = '';
+
 fetch('service-worker.js').then(r=>r.text()).then(t=>{const m=t.match(/CACHE_NAME\s*=\s*['"]([^'"]+)['"]/);if(m){const v=m[1].match(/-v(.+)$/);APP_VERSION=v?v[1].replace(/-/g,'.'):''}});
 
 const THEME_KEY='figurinhas-theme';
+
 let currentTheme=localStorage.getItem(THEME_KEY)||'system';
+
 function applyTheme(t){currentTheme=t;localStorage.setItem(THEME_KEY,t);if(t==='dark'||t==='light'){document.documentElement.setAttribute('data-theme',t)}else{document.documentElement.removeAttribute('data-theme')}}
+
 applyTheme(currentTheme);
 
 const n=(ini,fim)=>Array.from({length:fim-ini+1},(_,i)=>String(ini+i));
+
 const GRUPOS=[
   {grupo:'Grupo A',secoes:[{nome:'México',prefixo:'MEX',numeros:n(1,20)},{nome:'África do Sul',prefixo:'RSA',numeros:n(1,20)},{nome:'Coréia do Sul',prefixo:'KOR',numeros:n(1,20)},{nome:'Rep. Tcheca',prefixo:'CZE',numeros:n(1,20)}]},
   {grupo:'Grupo B',secoes:[{nome:'Canadá',prefixo:'CAN',numeros:n(1,20)},{nome:'Bósnia',prefixo:'BIH',numeros:n(1,20)},{nome:'Catar',prefixo:'QAT',numeros:n(1,20)},{nome:'Suíça',prefixo:'SUI',numeros:n(1,20)}]},
@@ -213,7 +251,9 @@ const GRUPOS=[
 ];
 
 const FLAGS={MEX:'mx',RSA:'za',KOR:'kr',CZE:'cz',CAN:'ca',BIH:'ba',QAT:'qa',SUI:'ch',BRA:'br',MAR:'ma',HAI:'ht',SCO:'gb-sct',USA:'us',PAR:'py',AUS:'au',TUR:'tr',GER:'de',CUW:'cw',CIV:'ci',ECU:'ec',NED:'nl',JPN:'jp',SWE:'se',TUN:'tn',BEL:'be',EGY:'eg',IRN:'ir',NZL:'nz',ESP:'es',CPV:'cv',KSA:'sa',URU:'uy',FRA:'fr',SEN:'sn',IRQ:'iq',NOR:'no',ARG:'ar',ALG:'dz',AUT:'at',JOR:'jo',POR:'pt',COD:'cd',UZB:'uz',COL:'co',ENG:'gb-eng',CRO:'hr',GHA:'gh',PAN:'pa'};
+
 const FLAG_EMOJIS={MEX:'🇲🇽',RSA:'🇿🇦',KOR:'🇰🇷',CZE:'🇨🇿',CAN:'🇨🇦',BIH:'🇧🇦',QAT:'🇶🇦',SUI:'🇨🇭',BRA:'🇧🇷',MAR:'🇲🇦',HAI:'🇭🇹',SCO:'🏴󠁧󠁢󠁳󠁣󠁴󠁿',USA:'🇺🇸',PAR:'🇵🇾',AUS:'🇦🇺',TUR:'🇹🇷',GER:'🇩🇪',CUW:'🇨🇼',CIV:'🇨🇮',ECU:'🇪🇨',NED:'🇳🇱',JPN:'🇯🇵',SWE:'🇸🇪',TUN:'🇹🇳',BEL:'🇧🇪',EGY:'🇪🇬',IRN:'🇮🇷',NZL:'🇳🇿',ESP:'🇪🇸',CPV:'🇨🇻',KSA:'🇸🇦',URU:'🇺🇾',FRA:'🇫🇷',SEN:'🇸🇳',IRQ:'🇮🇶',NOR:'🇳🇴',ARG:'🇦🇷',ALG:'🇩🇿',AUT:'🇦🇹',JOR:'🇯🇴',POR:'🇵🇹',COD:'🇨🇩',UZB:'🇺🇿',COL:'🇨🇴',ENG:'🏴󠁧󠁢󠁥󠁮󠁧󠁿',CRO:'🇭🇷',GHA:'🇬🇭',PAN:'🇵🇦',FWC:'⭐',CC:''}
+
 const GROUP_COLORS=['#155eef','#7a5af8','#dd2590','#eaaa08','#12b76a','#06aed4','#f79009','#f04438','#6172f3','#9e77ed','#17b26a','#2e90fa','#667085','#344054'];
 
 const STORAGE_KEY='figurinhas-copa-2026-mobile-v4';
@@ -231,7 +271,9 @@ const saved=JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]');
 const state=new Set(saved);
 const openTeams=new Set(lsGetJson(OPEN_TEAMS_KEY,[]));
 const closedTeams=new Set(lsGetJson(CLOSED_TEAMS_KEY,[]));
+
 const stickers=GRUPOS.flatMap((g,ordemGrupo)=>g.secoes.flatMap((s,ordemSecao)=>s.numeros.map((numero,ordem)=>({id:`${s.prefixo}-${numero}`,grupo:g.grupo,secao:s.nome,prefixo:s.prefixo,numero,ordemGrupo,ordemSecao,ordem}))));
+
 const _validGroups=new Set(['Todos',...GRUPOS.map(g=>g.grupo)]);
 const _sg=lsGet(GROUP_KEY,'Todos');
 let activeGroup=_validGroups.has(_sg)?_sg:'Todos';
@@ -242,6 +284,7 @@ let filterMode=['all','done','missing'].includes(_sf)?_sf:'all';
 
 const $=id=>document.getElementById(id);
 const stickerLabel=x=>`${x.prefixo}${x.numero}`;
+
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function norm(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
 function flagHtml(prefixo){const code=FLAGS[prefixo];return code?`<img class="flag" src="https://flagcdn.com/${code}.svg" alt="Bandeira ${prefixo}" loading="lazy">`:`<span class="flag placeholder">★</span>`}
@@ -259,7 +302,9 @@ function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredIte
 function allTeamKeys(){return GRUPOS.flatMap(g=>g.secoes.map(sec=>`${g.grupo}|${sec.prefixo}`))}
 
 function renderTabs(){const tabsEl=$('tabs');if(!tabsEl)return;const tabs=['Todos',...GRUPOS.map(g=>g.grupo)];tabsEl.innerHTML=tabs.map(t=>`<button class="tab ${t===activeGroup?'active':''}" data-g="${esc(t)}">${esc(t)}</button>`).join('');document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{activeGroup=b.dataset.g;lsSet(GROUP_KEY,activeGroup);render();window.scrollTo({top:0,behavior:'smooth'})})}
+
 function renderSortButtons(){const btn=$('fabSortToggle');if(!btn)return;const labels={'group':'Grupos','alpha':'A-Z','missing-desc':'+Falt.','missing-asc':'-Falt.'};const lbl=$('fabSortLabel');if(lbl)lbl.textContent=labels[sortMode]||'Grupos';btn.classList.toggle('active',sortMode!=='group');btn.setAttribute('aria-pressed',sortMode!=='group'?'true':'false')}
+
 function setSortMode(mode){sortMode=mode;localStorage.setItem('figurinhas-sort-mode',mode);renderSortButtons();render()}
 
 function openSortMenu(){
@@ -294,24 +339,6 @@ function setFilterMode(mode){filterMode=mode;lsSet(FILTER_KEY,mode);renderFilter
 function syncSectionState(){document.querySelectorAll('details.team').forEach(d=>{const key=d.dataset.key;if(openTeams.has(key)||closedTeams.has(key))return;if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)}})}
 function isTeamOpen(key, grupo, q){return closedTeams.has(key)?false:openTeams.has(key)||!!q||activeGroup!=='Todos'||grupo==='Página inicial'}
 
-// ── helper: builds the summary HTML with integrated progress bar ──
-function buildTeamSummary(sec, col, total) {
-  const pct = total > 0 ? Math.round(col / total * 100) : 0;
-  const isComplete = col === total;
-  const fillClass = isComplete ? 'team-progress-fill complete' : 'team-progress-fill';
-  return `<div class="team-summary-inner">
-    <div class="team-summary-top">
-      <span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span>
-      <span class="badge">${col}/${total}</span>
-    </div>
-    <div class="team-progress-row">
-      <div class="team-progress-track">
-        <div class="${fillClass}" style="width:${pct}%"></div>
-      </div>
-    </div>
-  </div>`;
-}
-
 function render(){
   renderTabs();
   syncSectionState();
@@ -336,9 +363,7 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      const sumEl = document.createElement('summary');
-      sumEl.innerHTML = buildTeamSummary(sec, col, teamItems.length);
-      d.appendChild(sumEl);
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
       const actions = document.createElement('div');
       actions.className='team-actions';
       actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
@@ -370,9 +395,7 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      const sumEl = document.createElement('summary');
-      sumEl.innerHTML = buildTeamSummary(sec, col, teamItems.length);
-      d.appendChild(sumEl);
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
       const actions = document.createElement('div');
       actions.className='team-actions';
       actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
@@ -411,9 +434,7 @@ function render(){
         d.dataset.key=key;
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-        const sumEl = document.createElement('summary');
-        sumEl.innerHTML = buildTeamSummary(sec, col, teamItems.length);
-        d.appendChild(sumEl);
+        d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
         const actions = document.createElement('div');
         actions.className='team-actions';
         actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
@@ -436,7 +457,9 @@ function render(){
 function updateStats(){const done=stickers.filter(x=>isDone(x.id)).length;const pct=Math.round(done/stickers.length*100);$('total').textContent=stickers.length;$('done').textContent=done;$('missing').textContent=stickers.length-done;$('pct').textContent=pct+'%';$('progressFill').style.width=pct+'%'}
 
 function exportCsv(){const rows=[['id','grupo','secao','prefixo','numero','colada'],...stickers.map(x=>[x.id,x.grupo,x.secao,x.prefixo,x.numero,isDone(x.id)?1:0])];const csv=rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='figurinhas-copa-2026.csv';a.click();URL.revokeObjectURL(a.href)}
+
 function parseLine(line){const out=[];let cur='',quoted=false;for(let i=0;i<line.length;i++){const ch=line[i],nx=line[i+1];if(ch==='"'&&quoted&&nx==='"'){cur+='"';i++}else if(ch==='"')quoted=!quoted;else if((ch===','||ch===';')&&!quoted){out.push(cur.trim());cur=''}else cur+=ch}out.push(cur.trim());return out.map(v=>v.replace(/^"|"$/g,'').replaceAll('""','"'))}
+
 async function importCsv(text){if(!await showConfirmModal('Importar backup','Importar CSV pode marcar ou desmarcar várias figurinhas. Continuar?'))return;const lines=text.split(/\r?\n/).filter(x=>x.trim());if(!lines.length)return;const h=parseLine(lines.shift()).map(norm);const id=h.indexOf('id'),pre=h.indexOf('prefixo'),num=h.indexOf('numero'),col=h.indexOf('colada');lines.forEach(line=>{const c=parseLine(line);let sid=id>=0?c[id]:'';if(!sid&&pre>=0&&num>=0)sid=`${c[pre]}-${c[num]}`;if(!stickers.some(x=>x.id===sid))return;setDone(sid,['1','sim','s','true','x','colada','yes','y'].includes(norm(c[col])))});save();render()}
 
 function buildPrint(){
@@ -524,6 +547,83 @@ function showThemePicker(){
   requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{THEMES.forEach(t=>{const btn=document.getElementById('_tp_'+t.id);if(btn)btn.onclick=()=>{closeTP();applyTheme(t.id);showToast(MSGS[t.id])}})},0)});
 }
 
+// ─── NOVO: showSettingsMenu ───────────────────────────────────────────────────
+function showSettingsMenu(){
+  const isBeta = window.location.pathname.includes('index-beta');
+  const overlay=document.createElement('div');
+  overlay.className='menu-overlay';
+  const panel=document.createElement('div');
+  panel.className='menu-panel';
+  panel.setAttribute('role','dialog');
+  panel.setAttribute('aria-modal','true');
+  panel.setAttribute('aria-label','Configurações');
+
+  const toggleStyle = `position:relative;width:44px;height:24px;background:${isBeta?'#155eef':'var(--line)'};border-radius:12px;flex-shrink:0;transition:background .2s`;
+  const knobStyle = `position:absolute;top:2px;left:${isBeta?'22px':'2px'};width:20px;height:20px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.2);transition:left .2s`;
+
+  panel.innerHTML=`
+    <div class="menu-sheet-handle"></div>
+    <div class="menu-sheet-title">Configurações</div>
+    <ul class="menu-sheet-list">
+      <li>
+        <button class="menu-sheet-item" id="_cfg_theme">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          <span style="flex:1">Tema</span>
+        </button>
+      </li>
+      <li>
+        <button class="menu-sheet-item" id="_cfg_beta" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <div style="display:flex;align-items:center;gap:14px;width:100%">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2v-4M9 21H5a2 2 0 0 1-2-2v-4m0 0h18"/></svg>
+            <span style="flex:1">Versão Beta</span>
+            <div style="${toggleStyle}" aria-hidden="true"><div style="${knobStyle}"></div></div>
+          </div>
+          <span style="font-size:11px;color:var(--muted);font-weight:400;padding-left:36px">Ativar recursos experimentais (versão beta)</span>
+        </button>
+      </li>
+      <li>
+        <div class="menu-sheet-info">
+          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span id="_cfg_version">Versão ${APP_VERSION||'...'}</span>
+        </div>
+      </li>
+    </ul>`;
+
+  overlay.appendChild(panel);
+  const onKeydown=e=>{if(e.key==='Escape')closeCfg()};
+  overlay._onKeydown=onKeydown;
+  document.addEventListener('keydown',onKeydown);
+  overlay.onclick=e=>{if(e.target===overlay)closeCfg()};
+  document.body.appendChild(overlay);
+
+  function closeCfg(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
+
+  requestAnimationFrame(()=>{
+    overlay.classList.add('active');
+    panel.classList.add('active');
+
+    // Atualiza versão caso APP_VERSION ainda esteja carregando
+    setTimeout(()=>{
+      const vEl=document.getElementById('_cfg_version');
+      if(vEl&&APP_VERSION)vEl.textContent='Versão '+APP_VERSION;
+    },800);
+
+    setTimeout(()=>{
+      document.getElementById('_cfg_theme').onclick=()=>{closeCfg();setTimeout(showThemePicker,310)};
+      document.getElementById('_cfg_beta').onclick=()=>{
+        closeCfg();
+        if(isBeta){
+          window.location.href=window.location.href.replace('index-beta.html','index.html');
+        } else {
+          window.location.href=window.location.href.replace('index.html','index-beta.html').replace(/\/$/, '/index-beta.html').replace(/([^/])$/, s=>s.includes('.html')?s:'index-beta.html');
+        }
+      };
+    },0);
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
+// ─── ATUALIZADO: openMenu — sem "Compartilhar link" e "Tema"; com "Configurações" ──
 function openMenu(){
   closeMenu();
   const overlay=document.createElement('div');
@@ -534,7 +634,7 @@ function openMenu(){
   panel.setAttribute('role','dialog');
   panel.setAttribute('aria-modal','true');
   panel.setAttribute('aria-label','Mais ações');
-  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Mais ações</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="menuShare"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Compartilhar link</button></li><li><button class="menu-sheet-item" id="menuExport"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Exportar backup</button></li><li><button class="menu-sheet-item" id="menuImport"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar backup</button></li><li><button class="menu-sheet-item" id="menuPrint"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button></li><li><button class="menu-sheet-item" id="menuTheme"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Tema</button></li></ul><div class="menu-sheet-footer">Versão ${APP_VERSION}</div>`;
+  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Mais ações</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="menuExport"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Exportar backup</button></li><li><button class="menu-sheet-item" id="menuImport"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Importar backup</button></li><li><button class="menu-sheet-item" id="menuPrint"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Imprimir</button></li><li><button class="menu-sheet-item" id="menuSettings"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Configurações</button></li></ul><div class="menu-sheet-footer">Versão ${APP_VERSION}</div>`;
   overlay.appendChild(panel);
   const onKeydown=e=>{if(e.key==='Escape')closeMenu()};
   overlay._onKeydown=onKeydown;
@@ -542,17 +642,18 @@ function openMenu(){
   overlay.onclick=e=>{if(e.target===overlay)closeMenu()};
   document.body.appendChild(overlay);
   requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{
-    $('menuShare').onclick=()=>{closeMenu();shareLink()};
     $('menuExport').onclick=()=>{closeMenu();exportCsv()};
     $('menuImport').onclick=()=>{closeMenu();$('importCsv').click()};
     $('menuPrint').onclick=()=>{closeMenu();buildPrint();window.print()};
-    $('menuTheme').onclick=()=>{closeMenu();setTimeout(showThemePicker,310)};
+    $('menuSettings').onclick=()=>{closeMenu();setTimeout(showSettingsMenu,310)};
   },0)});
 }
+// ─────────────────────────────────────────────────────────────────────────────
 
 function closeMenu(){const existing=$('menuOverlay');if(existing){if(existing._onKeydown)document.removeEventListener('keydown',existing._onKeydown);existing.classList.remove('active');const panel=existing.querySelector('.menu-panel');if(panel)panel.classList.remove('active');setTimeout(()=>existing.remove(),300)}}
 
 let _toastTimer=null;
+
 function showToast(msg,undoFn){
   let el=document.querySelector('.toast');
   if(el){clearTimeout(_toastTimer);el.remove()}
@@ -567,7 +668,9 @@ function showToast(msg,undoFn){
 
 const LOCK_ICON_CLOSED='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 const LOCK_ICON_OPEN='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
+
 function updateLockBtn(){const btn=$('lockBtn');if(!btn)return;btn.classList.toggle('locked',isLocked);btn.setAttribute('aria-label',isLocked?'Desbloquear edição':'Bloquear edição');btn.innerHTML=isLocked?LOCK_ICON_CLOSED:LOCK_ICON_OPEN}
+
 function toggleLock(){isLocked=!isLocked;localStorage.setItem('figurinhas-locked',isLocked?'1':'0');updateLockBtn();showToast(isLocked?'🔒 Álbum bloqueado':'🔓 Álbum desbloqueado')}
 
 function toggleSticker(id,label){
@@ -625,6 +728,7 @@ async function loadFromLink(){
   }
 }
 
+// ─── ATUALIZADO: showShareMenu — inclui "Compartilhar link" ──────────────────
 function showShareMenu(){
   const overlay=document.createElement('div');
   overlay.className='menu-overlay';
@@ -633,7 +737,7 @@ function showShareMenu(){
   panel.setAttribute('role','dialog');
   panel.setAttribute('aria-modal','true');
   panel.setAttribute('aria-label','Compartilhar');
-  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Compartilhar</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="_sm_app"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Compartilhar App</button></li><li><button class="menu-sheet-item" id="_sm_miss"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="11" y2="11"/></svg>Figurinhas Faltantes</button></li><li><button class="menu-sheet-item" id="_sm_done"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Figurinhas Coladas</button></li></ul>`;
+  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Compartilhar</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="_sm_app"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Compartilhar App</button></li><li><button class="menu-sheet-item" id="_sm_link"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Compartilhar link</button></li><li><button class="menu-sheet-item" id="_sm_miss"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="11" y2="11"/></svg>Figurinhas Faltantes</button></li><li><button class="menu-sheet-item" id="_sm_done"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Figurinhas Coladas</button></li></ul>`;
   overlay.appendChild(panel);
   const onKeydown=e=>{if(e.key==='Escape')close()};
   overlay._onKeydown=onKeydown;
@@ -643,20 +747,24 @@ function showShareMenu(){
   function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
   requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');setTimeout(()=>{
     document.getElementById('_sm_app').onclick=()=>{close();shareApp()};
+    document.getElementById('_sm_link').onclick=()=>{close();shareLink()};
     document.getElementById('_sm_miss').onclick=()=>{close();showStickerShareModal('missing')};
     document.getElementById('_sm_done').onclick=()=>{close();showStickerShareModal('done')};
   },0)});
 }
+// ─────────────────────────────────────────────────────────────────────────────
 
 function shareApp(){
   const url='https://etribas.github.io/copa2026/';
   if(navigator.share){navigator.share({title:'Figurinhas Copa 2026',text:'Controle sua coleção de figurinhas da Copa do Mundo 2026.',url}).catch(e=>{if(e.name!=='AbortError')_fallbackShareApp(url)})}
   else{_fallbackShareApp(url)}
 }
+
 function _fallbackShareApp(url){
   if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(()=>showToast('Link copiado para a área de transferência')).catch(()=>_showAppLinkModal(url))}
   else{_showAppLinkModal(url)}
 }
+
 function _showAppLinkModal(url){
   const id='alm'+Math.random().toString(36).slice(2);
   const container=document.createElement('div');
@@ -676,13 +784,6 @@ const installPromptId='installPrompt'+Math.random().toString(36).slice(2);
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredPrompt=e;
-  const bar=document.createElement('div');
-  bar.id=installPromptId;
-  bar.style.cssText='position:fixed;bottom:calc(72px + env(safe-area-inset-bottom,0px));left:50%;transform:translateX(-50%);background:#1a1f2e;color:#fff;border-radius:16px;padding:12px 16px;font-size:13px;font-weight:700;display:flex;align-items:center;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.25);z-index:199;white-space:nowrap;max-width:calc(100vw - 32px)';
-  bar.innerHTML='<span>Instalar app</span><button style="background:#155eef;border:none;border-radius:10px;color:#fff;padding:5px 12px;font-size:12px;font-weight:800;cursor:pointer">Instalar</button><button style="background:none;border:none;color:rgba(255,255,255,.6);font-size:16px;cursor:pointer;padding:2px 6px">✕</button>';
-  document.body.appendChild(bar);
-  bar.querySelectorAll('button')[0].onclick=async()=>{deferredPrompt.prompt();const{outcome}=await deferredPrompt.userChoice;deferredPrompt=null;bar.remove()};
-  bar.querySelectorAll('button')[1].onclick=()=>bar.remove();
 });
 
 render();
