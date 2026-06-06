@@ -13,7 +13,7 @@
     :root{color-scheme:light dark;--bg:#f5f7fb;--card:#fff;--ink:#121826;--muted:#667085;--line:#e5e7ef;--ok:#128a46;--brand:#155eef;--brand2:#eff4ff;--shadow:0 8px 24px rgba(16,24,40,.08)}
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;padding-bottom:96px}button,input{font:inherit}
     .appbar{position:sticky;top:0;z-index:10;background:rgba(245,247,251,.96);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);padding:10px 12px}.title{display:flex;justify-content:flex-start;align-items:center;gap:12px;max-width:960px;margin:auto}.title h1{font-size:18px;margin:0}.pill{font-size:12px;color:var(--brand);background:var(--brand2);padding:5px 9px;border-radius:99px;font-weight:800;white-space:nowrap}
-    .searchbar{max-width:960px;margin:10px auto 0;position:relative}.searchbar input{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow)}.searchbar .clear-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:18px;color:#667085;cursor:pointer;padding:4px 6px;display:none}.searchbar input:not(:placeholder-shown)~.clear-btn{display:block}.searchbar .clear-btn:hover{color:#344054}.stats{max-width:960px;margin:12px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 7px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}.stat:hover{border-color:var(--brand)}.stat.active{border-color:var(--brand);background:var(--brand2)}.stat.active b{color:var(--brand)}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--muted)}.tabs{max-width:960px;margin:12px auto 0;display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:10px 13px;white-space:nowrap;font-weight:800;color:var(--ink)}.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+    .searchbar{max-width:960px;margin:10px auto 0;position:relative}.searchbar input{width:100%;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:16px;padding:13px 14px;box-shadow:var(--shadow);font-size:16px}.searchbar .clear-btn{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;font-size:18px;color:#667085;cursor:pointer;padding:4px 6px;display:none}.searchbar input:not(:placeholder-shown)~.clear-btn{display:block}.searchbar .clear-btn:hover{color:#344054}.stats{max-width:960px;margin:12px auto 0;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:9px 7px;text-align:center;cursor:pointer;transition:border-color .15s,background .15s}.stat:hover{border-color:var(--brand)}.stat.active{border-color:var(--brand);background:var(--brand2)}.stat.active b{color:var(--brand)}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:var(--muted)}.tabs{max-width:960px;margin:12px auto 0;display:flex;gap:8px;overflow:auto;padding-bottom:2px;scrollbar-width:none}.tabs::-webkit-scrollbar{display:none}.tab{border:1px solid var(--line);background:var(--card);border-radius:999px;padding:10px 13px;white-space:nowrap;font-weight:800;color:var(--ink)}.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
     .menu-btn{border:1px solid var(--line);background:var(--card);border-radius:16px;padding:8px 10px;min-width:44px;height:44px;font-size:20px;font-weight:900;color:var(--ink);cursor:pointer}
     .menu-btn.locked{background:var(--brand);border-color:var(--brand);color:#fff}
     .menu-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.45);z-index:30;display:none}
@@ -60,6 +60,9 @@
     @keyframes sticker-exit-missing{0%{opacity:1;transform:scale(1)}20%{opacity:1;transform:scale(1.1)}100%{opacity:0;transform:scale(.85)}}
     .sticker.anim-exit-missing{animation:sticker-exit-missing 300ms ease-out forwards;pointer-events:none}
     @media(prefers-reduced-motion:reduce){.sticker.anim-exit-missing{animation:none;opacity:0}}
+    @keyframes sticker-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
+    .sticker.anim-shake{animation:sticker-shake .35s ease-out}
+    @media(prefers-reduced-motion:reduce){.sticker.anim-shake{animation:none}}
     .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
     .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
     .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
@@ -413,7 +416,12 @@ const LOCK_ICON_OPEN='<svg xmlns="http://www.w3.org/2000/svg" width="20" height=
 function updateLockBtn(){const btn=$('lockBtn');if(!btn)return;btn.classList.toggle('locked',isLocked);btn.setAttribute('aria-label',isLocked?'Desbloquear edição':'Bloquear edição');btn.innerHTML=isLocked?LOCK_ICON_CLOSED:LOCK_ICON_OPEN}
 function toggleLock(){isLocked=!isLocked;localStorage.setItem('figurinhas-locked',isLocked?'1':'0');updateLockBtn();showToast(isLocked?'🔒 Álbum bloqueado':'🔓 Álbum desbloqueado')}
 function toggleSticker(id,label){
-  if(isLocked)return;
+  if(isLocked){
+    const btn=document.querySelector(`.sticker[data-id="${id}"]`);
+    if(btn){btn.classList.add('anim-shake');btn.addEventListener('animationend',()=>btn.classList.remove('anim-shake'),{once:true})}
+    showToast('🔒 Álbum bloqueado');
+    return;
+  }
   const wasDone=isDone(id);
   if(!wasDone&&filterMode==='missing'){
     const btn=document.querySelector(`.sticker[data-id="${id}"]`);
