@@ -193,11 +193,13 @@
 
 @media(prefers-reduced-motion:reduce){.ctry-msg{animation:none;opacity:0}}
 
-@keyframes ctry-confetti{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(130px) rotate(500deg);opacity:0}}
+@keyframes fw-spark{0%{transform:rotate(var(--a)) translateX(0) scale(1);opacity:1}70%{opacity:.8}100%{transform:rotate(var(--a)) translateX(var(--d)) scale(0);opacity:0}}
 
-.ctry-dot{position:absolute;top:0;left:var(--cx);width:7px;height:7px;border-radius:1px;background:var(--cc);animation:ctry-confetti .95s var(--cd) ease-in forwards}
+.fw-burst{position:absolute;left:var(--bx);top:var(--by);width:0;height:0}
 
-@media(prefers-reduced-motion:reduce){.ctry-dot{display:none}}
+.fw-spark{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--pc);box-shadow:0 0 5px 1px var(--pc);transform-origin:0 0;animation:fw-spark var(--dur) var(--del) cubic-bezier(.1,0,.7,1) forwards;opacity:0}
+
+@media(prefers-reduced-motion:reduce){.fw-spark{display:none}}
 
 .grid{position:relative}
 
@@ -751,8 +753,15 @@ function celebrateCountryComplete(prefixo){
   const cel=document.createElement('div');
   cel.className='ctry-cel';
   if(!reduced){
-    const COLORS=['#155eef','#12b76a','#f79009','#dd2590','#7a5af8','#eaaa08'];
-    for(let i=0;i<16;i++){const p=document.createElement('span');p.className='ctry-dot';p.style.cssText=`--cx:${(Math.random()*88+4).toFixed(1)}%;--cd:${(Math.random()*.5).toFixed(2)}s;--cc:${COLORS[i%COLORS.length]}`;cel.appendChild(p)}
+    const COLORS=['#f7b731','#ff4757','#2ed573','#1e90ff','#eccc68','#ff6b81','#a29bfe','#fff'];
+    const W=teamEl.offsetWidth||300;const H=teamEl.offsetHeight||160;
+    [{x:W*.22,y:H*.45,del:0},{x:W*.78,y:H*.38,del:.28},{x:W*.5,y:H*.42,del:.52}].forEach(b=>{
+      const burst=document.createElement('div');
+      burst.className='fw-burst';
+      burst.style.cssText=`--bx:${b.x.toFixed(0)}px;--by:${b.y.toFixed(0)}px`;
+      for(let i=0;i<14;i++){const p=document.createElement('span');p.className='fw-spark';const angle=(360/14*i+Math.random()*10).toFixed(1);const dist=(48+Math.random()*36).toFixed(0);const dur=(.55+Math.random()*.25).toFixed(2);p.style.cssText=`--a:${angle}deg;--d:${dist}px;--pc:${COLORS[i%COLORS.length]};--dur:${dur}s;--del:${b.del.toFixed(2)}s`;burst.appendChild(p)}
+      cel.appendChild(burst);
+    });
   }
   const msg=document.createElement('div');
   msg.className='ctry-msg';
