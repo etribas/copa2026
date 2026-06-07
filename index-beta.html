@@ -35,7 +35,7 @@
     main{max-width:960px;margin:12px auto;padding:0 12px 28px}.hint{color:var(--muted);font-size:12px;margin:14px 2px}
 .group-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px;padding:8px 8px 8px 10px;border-radius:14px}.group-head h2{font-size:16px;margin:0}.group-actions{display:flex;gap:6px}.mini{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 9px;font-size:12px;font-weight:800;color:var(--ink)}
 .team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
-.team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;font-weight:800;color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:9px;padding:0 14px 14px}.sticker{min-height:58px;border:1px solid var(--line);border-radius:16px;background:var(--card);padding:8px 6px;text-align:center;font-weight:950;cursor:pointer}.sticker small{display:block;margin-top:3px;font-size:10px;color:var(--muted);font-weight:750}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
+.team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;font-weight:800;color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 14px 14px}.sticker{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:6px 4px;text-align:center;font-weight:950;cursor:pointer}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
 .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:6px}.fabbar button{border:1px solid var(--line);background:var(--card);border-radius:16px;width:56px;height:56px;min-width:44px;min-height:44px;font-size:22px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .1s;color:var(--ink)}.fabbar button:hover{background:var(--line)}.fabbar button:active{transform:scale(.93)}.fabbar button.active{background:var(--brand);border-color:var(--brand);color:#fff}.fab-az{font-size:14px;letter-spacing:.5px}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
     @media(min-width:900px){body{padding-bottom:30px}.fabbar{position:sticky;bottom:10px;margin:18px auto;transform:none;left:auto;right:auto}.grid{grid-template-columns:repeat(10,1fr)}}
@@ -377,7 +377,7 @@ function render(){
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
       const grid = document.createElement('div');
       grid.className='grid';
-      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
@@ -404,7 +404,7 @@ function render(){
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
       const grid = document.createElement('div');
       grid.className='grid';
-      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
@@ -436,7 +436,7 @@ function render(){
         d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
         const grid = document.createElement('div');
         grid.className='grid';
-        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
         addWatermarkIfComplete(grid,col,teamItems.length);
         d.appendChild(grid);
         album.appendChild(d);
@@ -560,10 +560,17 @@ function showSettingsMenu(){
     <div class="menu-sheet-title">Configurações</div>
     <ul class="menu-sheet-list">
       <li>
-        <button class="menu-sheet-item" id="_cfg_theme">
-          <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
-          <span style="flex:1">Tema</span>
-        </button>
+        <div style="padding:4px 0">
+          <div style="display:flex;align-items:center;gap:14px;padding:12px 12px 4px;color:var(--ink)">
+            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+            <span style="flex:1;font-size:15px;font-weight:700">Tema</span>
+          </div>
+          <div style="display:flex;gap:6px;padding:6px 12px 12px 48px">
+            <button id="_tp_system" aria-pressed="${currentTheme==='system'}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid ${currentTheme==='system'?'var(--brand)':'var(--line)'};background:${currentTheme==='system'?'var(--brand)':'var(--card)'};color:${currentTheme==='system'?'#fff':'var(--ink)'};border-radius:999px;padding:8px 4px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="13" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="16" x2="12" y2="21"/></svg>Sistema</button>
+            <button id="_tp_light" aria-pressed="${currentTheme==='light'}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid ${currentTheme==='light'?'var(--brand)':'var(--line)'};background:${currentTheme==='light'?'var(--brand)':'var(--card)'};color:${currentTheme==='light'?'#fff':'var(--ink)'};border-radius:999px;padding:8px 4px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="2" y1="12" x2="4" y2="12"/><line x1="20" y1="12" x2="22" y2="12"/></svg>Claro</button>
+            <button id="_tp_dark" aria-pressed="${currentTheme==='dark'}" style="flex:1;display:flex;align-items:center;justify-content:center;gap:4px;border:1px solid ${currentTheme==='dark'?'var(--brand)':'var(--line)'};background:${currentTheme==='dark'?'var(--brand)':'var(--card)'};color:${currentTheme==='dark'?'#fff':'var(--ink)'};border-radius:999px;padding:8px 4px;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,color .15s,border-color .15s"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>Escuro</button>
+          </div>
+        </div>
       </li>
       <li>
         <button class="menu-sheet-item" id="_cfg_beta" style="flex-direction:column;align-items:flex-start;gap:4px">
@@ -604,7 +611,9 @@ function showSettingsMenu(){
     },800);
 
     setTimeout(()=>{
-      document.getElementById('_cfg_theme').onclick=()=>{closeCfg();setTimeout(showThemePicker,310)};
+      const _themeChips=[{id:'system',msg:'🖥️ Tema do sistema'},{id:'light',msg:'☀️ Tema claro'},{id:'dark',msg:'🌙 Tema escuro'}];
+      const _updateThemeChips=active=>{_themeChips.forEach(t=>{const b=document.getElementById('_tp_'+t.id);if(!b)return;const on=t.id===active;b.style.background=on?'var(--brand)':'var(--card)';b.style.borderColor=on?'var(--brand)':'var(--line)';b.style.color=on?'#fff':'var(--ink)';b.setAttribute('aria-pressed',String(on))})};
+      _themeChips.forEach(t=>{const btn=document.getElementById('_tp_'+t.id);if(btn)btn.onclick=()=>{applyTheme(t.id);showToast(t.msg);_updateThemeChips(t.id)}});
       document.getElementById('_cfg_beta').onclick=()=>{
         closeCfg();
         if(isBeta){
@@ -723,8 +732,7 @@ function toggleSticker(id,label){
     if(btn){
       setDone(id,true);
       btn.classList.add('done');
-      const sm=btn.querySelector('small');
-      if(sm)sm.textContent='colada';
+      btn.setAttribute('aria-label',`${label} – colada`);
       let settled=false;
       const finish=()=>{if(settled)return;settled=true;save();if(!wasComplete&&stickerPfx&&isCountryComplete(stickerPfx)){celebrateCountryComplete(stickerPfx);setTimeout(render,900)}else{render()}};
       showToast(`${label} colada`,()=>{settled=true;setDone(id,false);save();render()});
