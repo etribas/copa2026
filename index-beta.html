@@ -205,20 +205,6 @@
 
 .ctry-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;user-select:none;font-size:88px;line-height:1;opacity:.07}
 
-/* ── Album layout ──────────────────────────────────────────────────────────── */
-.team-album-layout{display:flex;flex-direction:column;gap:10px;padding:0 14px 14px;position:relative}
-.album-page{background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:8px}
-.album-page-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
-.album-art-team{grid-column:span 2;border:1px dashed var(--brand);border-radius:12px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:72px;text-align:center;background:var(--brand2);gap:2px}
-.album-art-team .at-we{font-size:8px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.8px;line-height:1}
-.album-art-team .at-name{font-size:11px;font-weight:900;color:var(--ink);line-height:1.1;word-break:break-word}
-.album-art-team .at-flag{font-size:20px;line-height:1}
-.album-art-group{border:1px solid var(--line);border-radius:12px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:58px;text-align:center;gap:2px}
-.album-art-group .ag-g{font-size:7px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;line-height:1}
-.album-art-group .ag-l{font-size:22px;font-weight:900;line-height:1}
-.sticker-landscape-wrap{grid-column:span 2;display:flex;align-items:center;justify-content:center;padding:0 12%}
-.sticker-landscape-wrap .sticker{flex:1;min-height:unset;height:58px}
-
   </style>
   <script>(function(){var t=localStorage.getItem('figurinhas-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
 </head>
@@ -463,7 +449,9 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const grid = buildTeamContent(sec,grupo,teamItems);
+      const grid = document.createElement('div');
+      grid.className='grid';
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
@@ -488,7 +476,9 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const grid = buildTeamContent(sec,grupo,teamItems);
+      const grid = document.createElement('div');
+      grid.className='grid';
+      teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
       addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
@@ -518,7 +508,9 @@ function render(){
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
         d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-        const grid = buildTeamContent(sec,g.grupo,teamItems);
+        const grid = document.createElement('div');
+        grid.className='grid';
+        teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
         addWatermarkIfComplete(grid,col,teamItems.length);
         d.appendChild(grid);
         album.appendChild(d);
@@ -692,7 +684,7 @@ function showSettingsMenu(){
         if(isBeta){
           window.location.href=window.location.href.replace('index-beta.html','index.html');
         } else {
-          window.location.href=window.location.href.replace('index.html','index-beta.html').replace(/\/$/, '/index-beta.html').replace(/([^/])$/, s=>s.includes('.html')?s:'index-beta.html');
+          window.location.href=window.location.href.replace('index.html','index-beta.html').replace(/\/$/, '/index-beta.html');
         }
       };
     },0);
@@ -786,70 +778,6 @@ function addWatermarkIfComplete(grid,col,total){
   wm.setAttribute('aria-hidden','true');
   wm.textContent='🏆';
   grid.appendChild(wm);
-}
-
-function buildAlbumLayout(sec,grupo,teamItems){
-  const allStickers=stickers.filter(x=>x.prefixo===sec.prefixo).sort((a,b)=>parseInt(a.numero)-parseInt(b.numero));
-  const visibleIds=new Set(teamItems.map(x=>x.id));
-  function makeSlot(x){
-    const b=document.createElement('button');
-    b.className='sticker'+(isDone(x.id)?' done':'');
-    b.dataset.id=x.id;
-    b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;
-    b.onclick=()=>toggleSticker(x.id,stickerLabel(x));
-    if(!visibleIds.has(x.id)){b.style.visibility='hidden';b.style.pointerEvents='none'}
-    return b;
-  }
-  const layout=document.createElement('div');
-  layout.className='team-album-layout';
-  // ── Página 1 ──────────────────────────────────────────────────────────────
-  const page1=document.createElement('div');
-  page1.className='album-page';
-  const g1=document.createElement('div');
-  g1.className='album-page-grid';
-  // Linha 1: arte WE ARE (cols 1-2) + figurinhas 1 e 2 (cols 3-4)
-  const artTeam=document.createElement('div');
-  artTeam.className='album-art-team';
-  artTeam.innerHTML=`<span class="at-we">WE ARE</span><span class="at-name">${esc(sec.nome.toUpperCase())}</span><span class="at-flag">${FLAG_EMOJIS[sec.prefixo]||''}</span>`;
-  g1.appendChild(artTeam);
-  [0,1].forEach(i=>{if(allStickers[i])g1.appendChild(makeSlot(allStickers[i]))});
-  // Linha 2: figurinhas 3-6
-  [2,3,4,5].forEach(i=>{if(allStickers[i])g1.appendChild(makeSlot(allStickers[i]))});
-  // Linha 3: figurinhas 7-10
-  [6,7,8,9].forEach(i=>{if(allStickers[i])g1.appendChild(makeSlot(allStickers[i]))});
-  page1.appendChild(g1);
-  layout.appendChild(page1);
-  // ── Página 2 ──────────────────────────────────────────────────────────────
-  const page2=document.createElement('div');
-  page2.className='album-page';
-  const g2=document.createElement('div');
-  g2.className='album-page-grid';
-  // Linha 1: figurinhas 11, 12 (cols 1-2) + figurinha 13 paisagem (cols 3-4)
-  [10,11].forEach(i=>{if(allStickers[i])g2.appendChild(makeSlot(allStickers[i]))});
-  if(allStickers[12]){const lw=document.createElement('div');lw.className='sticker-landscape-wrap';lw.appendChild(makeSlot(allStickers[12]));g2.appendChild(lw)}
-  // Linha 2: figurinhas 14-17
-  [13,14,15,16].forEach(i=>{if(allStickers[i])g2.appendChild(makeSlot(allStickers[i]))});
-  // Linha 3: arte do grupo (col 1) + figurinhas 18-20 (cols 2-4)
-  const artGroup=document.createElement('div');
-  artGroup.className='album-art-group';
-  const gc=groupColor(grupo);
-  artGroup.style.cssText=`border-color:${gc};background:linear-gradient(135deg,${gc}18,var(--card))`;
-  artGroup.innerHTML=`<span class="ag-g">Grupo</span><span class="ag-l" style="color:${gc}">${esc(grupo.replace('Grupo ',''))}</span>`;
-  g2.appendChild(artGroup);
-  [17,18,19].forEach(i=>{if(allStickers[i])g2.appendChild(makeSlot(allStickers[i]))});
-  page2.appendChild(g2);
-  layout.appendChild(page2);
-  return layout;
-}
-
-function buildTeamContent(sec,grupo,teamItems){
-  if(sec.prefixo==='FWC'||sec.prefixo==='CC'){
-    const grid=document.createElement('div');
-    grid.className='grid';
-    teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
-    return grid;
-  }
-  return buildAlbumLayout(sec,grupo,teamItems);
 }
 
 function toggleSticker(id,label){

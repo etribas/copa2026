@@ -1,4 +1,4 @@
-const CACHE_NAME = 'figurinhas-v2-0-4';
+const CACHE_NAME = 'figurinhas-v2-0-5';
 const ASSETS = [
   './index.html',
   './manifest.json',
