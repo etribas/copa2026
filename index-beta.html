@@ -421,12 +421,6 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const actions = document.createElement('div');
-      actions.className='team-actions';
-      actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-      d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -453,12 +447,6 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const actions = document.createElement('div');
-      actions.className='team-actions';
-      actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-      d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -476,9 +464,7 @@ function render(){
       head.className='group-head';
       head.style.borderLeft=`8px solid ${groupColor(g.grupo)}`;
       head.style.background=`linear-gradient(90deg, ${groupColor(g.grupo)}18, transparent)`;
-      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2><div class="group-actions"><button class="mini" data-a="mark">Marcar</button><button class="mini" data-a="clear">Limpar</button></div>`;
-      head.querySelector('[data-a="mark"]').onclick=async ()=>{if(!await showConfirmModal('Marcar grupo',`Marcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,true));save();render()};
-      head.querySelector('[data-a="clear"]').onclick=async ()=>{if(!await showConfirmModal('Limpar grupo',`Desmarcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,false));save();render()};
+      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2>`;
       album.appendChild(head);
       const sections = g.secoes;
       sections.forEach(sec=>{
@@ -492,12 +478,6 @@ function render(){
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
         d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-        const actions = document.createElement('div');
-        actions.className='team-actions';
-        actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-        actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-        actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-        d.appendChild(actions);
         const grid = document.createElement('div');
         grid.className='grid';
         teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
