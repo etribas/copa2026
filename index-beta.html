@@ -798,7 +798,7 @@ function toggleSticker(id,label){
       const sm=btn.querySelector('small');
       if(sm)sm.textContent='colada';
       let settled=false;
-      const finish=()=>{if(settled)return;settled=true;save();render();if(!wasComplete&&stickerPfx&&isCountryComplete(stickerPfx))requestAnimationFrame(()=>celebrateCountryComplete(stickerPfx))};
+      const finish=()=>{if(settled)return;settled=true;save();if(!wasComplete&&stickerPfx&&isCountryComplete(stickerPfx)){celebrateCountryComplete(stickerPfx);setTimeout(render,900)}else{render()}};
       showToast(`${label} colada`,()=>{settled=true;setDone(id,false);save();render()});
       if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){finish()}
       else{btn.classList.add('anim-exit-missing');btn.addEventListener('animationend',finish,{once:true});setTimeout(finish,400)}
