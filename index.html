@@ -177,6 +177,34 @@
 
 .sort-label{font-size:9px;font-weight:700;line-height:1;white-space:nowrap;text-align:center}
 
+.team{position:relative}
+
+@keyframes ctry-pulse{0%,100%{box-shadow:var(--shadow)}45%{box-shadow:0 0 0 3px rgba(18,138,70,.42),var(--shadow)}}
+
+.ctry-pulse{animation:ctry-pulse 1.4s ease-in-out}
+
+@media(prefers-reduced-motion:reduce){.ctry-pulse{animation:none}}
+
+@keyframes ctry-msg{0%{opacity:0;transform:scale(.82)}18%{opacity:1;transform:scale(1.05)}28%{transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(.95)}}
+
+.ctry-cel{position:absolute;inset:0;z-index:5;pointer-events:none;overflow:hidden;display:flex;align-items:center;justify-content:center}
+
+.ctry-msg{background:rgba(18,138,70,.92);color:#fff;border-radius:12px;padding:10px 20px;font-size:15px;font-weight:800;box-shadow:0 4px 16px rgba(0,0,0,.2);animation:ctry-msg 3.2s ease-in-out forwards;white-space:nowrap}
+
+@media(prefers-reduced-motion:reduce){.ctry-msg{animation:none;opacity:0}}
+
+@keyframes fw-spark{0%{transform:rotate(var(--a)) translateX(0) scale(1);opacity:1}70%{opacity:.8}100%{transform:rotate(var(--a)) translateX(var(--d)) scale(0);opacity:0}}
+
+.fw-burst{position:absolute;left:var(--bx);top:var(--by);width:0;height:0}
+
+.fw-spark{position:absolute;width:5px;height:5px;border-radius:50%;background:var(--pc);box-shadow:0 0 5px 1px var(--pc);transform-origin:0 0;animation:fw-spark var(--dur) var(--del) cubic-bezier(.1,0,.7,1) forwards;opacity:0}
+
+@media(prefers-reduced-motion:reduce){.fw-spark{display:none}}
+
+.grid{position:relative}
+
+.ctry-wm{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;user-select:none;font-size:88px;line-height:1;opacity:.07}
+
   </style>
   <script>(function(){var t=localStorage.getItem('figurinhas-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
 </head>
@@ -421,15 +449,10 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const actions = document.createElement('div');
-      actions.className='team-actions';
-      actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-      d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -453,15 +476,10 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-      const actions = document.createElement('div');
-      actions.className='team-actions';
-      actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-      actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-      actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-      d.appendChild(actions);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+      addWatermarkIfComplete(grid,col,teamItems.length);
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -476,9 +494,7 @@ function render(){
       head.className='group-head';
       head.style.borderLeft=`8px solid ${groupColor(g.grupo)}`;
       head.style.background=`linear-gradient(90deg, ${groupColor(g.grupo)}18, transparent)`;
-      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2><div class="group-actions"><button class="mini" data-a="mark">Marcar</button><button class="mini" data-a="clear">Limpar</button></div>`;
-      head.querySelector('[data-a="mark"]').onclick=async ()=>{if(!await showConfirmModal('Marcar grupo',`Marcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,true));save();render()};
-      head.querySelector('[data-a="clear"]').onclick=async ()=>{if(!await showConfirmModal('Limpar grupo',`Desmarcar todas as ${groupItems.length} figurinhas de ${g.grupo}?`))return;groupItems.forEach(x=>setDone(x.id,false));save();render()};
+      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2>`;
       album.appendChild(head);
       const sections = g.secoes;
       sections.forEach(sec=>{
@@ -492,15 +508,10 @@ function render(){
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
         d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
-        const actions = document.createElement('div');
-        actions.className='team-actions';
-        actions.innerHTML = '<button>Marcar seção</button><button>Limpar seção</button>';
-        actions.children[0].onclick = async ()=>{if(!await showConfirmModal('Marcar seção',`Marcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,true));save();render()};
-        actions.children[1].onclick = async ()=>{if(!await showConfirmModal('Limpar seção',`Desmarcar todas as ${teamItems.length} figurinhas de ${sec.nome}?`))return;teamItems.forEach(x=>setDone(x.id,false));save();render()};
-        d.appendChild(actions);
         const grid = document.createElement('div');
         grid.className='grid';
         teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.innerHTML=`${esc(stickerLabel(x))}<small>${isDone(x.id)?'colada':'faltante'}</small>`;b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
+        addWatermarkIfComplete(grid,col,teamItems.length);
         d.appendChild(grid);
         album.appendChild(d);
       });
@@ -731,6 +742,44 @@ function updateLockBtn(){const btn=$('lockBtn');if(!btn)return;btn.classList.tog
 
 function toggleLock(){isLocked=!isLocked;localStorage.setItem('figurinhas-locked',isLocked?'1':'0');updateLockBtn();showToast(isLocked?'🔒 Álbum bloqueado':'🔓 Álbum desbloqueado')}
 
+function isCountryComplete(prefixo){return stickers.filter(x=>x.prefixo===prefixo).every(x=>isDone(x.id))}
+
+function celebrateCountryComplete(prefixo){
+  const teamEl=document.querySelector(`.team[data-key$="|${prefixo}"]`);
+  if(!teamEl)return;
+  const reduced=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+  teamEl.classList.add('ctry-pulse');
+  teamEl.addEventListener('animationend',()=>teamEl.classList.remove('ctry-pulse'),{once:true});
+  const cel=document.createElement('div');
+  cel.className='ctry-cel';
+  if(!reduced){
+    const COLORS=['#f7b731','#ff4757','#2ed573','#1e90ff','#eccc68','#ff6b81','#a29bfe','#fff'];
+    const W=teamEl.offsetWidth||300;const H=teamEl.offsetHeight||160;
+    [{x:W*.22,y:H*.45,del:0},{x:W*.78,y:H*.38,del:.28},{x:W*.5,y:H*.42,del:.52}].forEach(b=>{
+      const burst=document.createElement('div');
+      burst.className='fw-burst';
+      burst.style.cssText=`--bx:${b.x.toFixed(0)}px;--by:${b.y.toFixed(0)}px`;
+      for(let i=0;i<14;i++){const p=document.createElement('span');p.className='fw-spark';const angle=(360/14*i+Math.random()*10).toFixed(1);const dist=(48+Math.random()*36).toFixed(0);const dur=(.55+Math.random()*.25).toFixed(2);p.style.cssText=`--a:${angle}deg;--d:${dist}px;--pc:${COLORS[i%COLORS.length]};--dur:${dur}s;--del:${b.del.toFixed(2)}s`;burst.appendChild(p)}
+      cel.appendChild(burst);
+    });
+  }
+  const msg=document.createElement('div');
+  msg.className='ctry-msg';
+  msg.textContent='🏆 Seleção completa!';
+  cel.appendChild(msg);
+  teamEl.appendChild(cel);
+  setTimeout(()=>cel.remove(),3500);
+}
+
+function addWatermarkIfComplete(grid,col,total){
+  if(col<total)return;
+  const wm=document.createElement('div');
+  wm.className='ctry-wm';
+  wm.setAttribute('aria-hidden','true');
+  wm.textContent='🏆';
+  grid.appendChild(wm);
+}
+
 function toggleSticker(id,label){
   if(isLocked){
     const btn=document.querySelector(`.sticker[data-id="${id}"]`);
@@ -739,6 +788,8 @@ function toggleSticker(id,label){
     return;
   }
   const wasDone=isDone(id);
+  const stickerPfx=stickers.find(x=>x.id===id)?.prefixo;
+  const wasComplete=stickerPfx?isCountryComplete(stickerPfx):true;
   if(!wasDone&&filterMode==='missing'){
     const btn=document.querySelector(`.sticker[data-id="${id}"]`);
     if(btn){
@@ -747,7 +798,7 @@ function toggleSticker(id,label){
       const sm=btn.querySelector('small');
       if(sm)sm.textContent='colada';
       let settled=false;
-      const finish=()=>{if(settled)return;settled=true;save();render()};
+      const finish=()=>{if(settled)return;settled=true;save();if(!wasComplete&&stickerPfx&&isCountryComplete(stickerPfx)){celebrateCountryComplete(stickerPfx);setTimeout(render,900)}else{render()}};
       showToast(`${label} colada`,()=>{settled=true;setDone(id,false);save();render()});
       if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){finish()}
       else{btn.classList.add('anim-exit-missing');btn.addEventListener('animationend',finish,{once:true});setTimeout(finish,400)}
@@ -757,6 +808,7 @@ function toggleSticker(id,label){
   setDone(id,!wasDone);
   save();
   render();
+  if(!wasDone&&!wasComplete&&stickerPfx&&isCountryComplete(stickerPfx))requestAnimationFrame(()=>celebrateCountryComplete(stickerPfx));
   const btn=document.querySelector(`.sticker[data-id="${id}"]`);
   if(btn){const cls=wasDone?'anim-uncheck':'anim-pop';btn.classList.add(cls);btn.addEventListener('animationend',()=>btn.classList.remove(cls),{once:true})}
   showToast(wasDone?`${label} desmarcada`:`${label} colada`,()=>{setDone(id,wasDone);save();render()});
