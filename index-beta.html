@@ -374,7 +374,7 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -401,7 +401,7 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -420,7 +420,7 @@ function render(){
       head.className='group-head';
       head.style.borderLeft=`8px solid ${groupColor(g.grupo)}`;
       head.style.background=`linear-gradient(90deg, ${groupColor(g.grupo)}18, transparent)`;
-      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${gd}/${groupItems.length}</span></h2>`;
+      head.innerHTML=`<h2>${esc(g.grupo)} <span class="badge">${stickers.filter(x=>x.grupo===g.grupo&&isDone(x.id)).length}/${stickers.filter(x=>x.grupo===g.grupo).length}</span></h2>`;
       album.appendChild(head);
       const sections = g.secoes;
       sections.forEach(sec=>{
@@ -433,7 +433,7 @@ function render(){
         d.dataset.key=key;
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-        d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${col}/${teamItems.length}</span></summary>`;
+        d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
         const grid = document.createElement('div');
         grid.className='grid';
         teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
