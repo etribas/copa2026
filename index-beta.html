@@ -135,6 +135,12 @@
 .sticker-tooltip::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-top-color:#1a1f2e}
 .sticker-tooltip.tip-below::after{display:none}
 .sticker-tooltip.tip-below::before{content:'';position:absolute;bottom:100%;left:50%;transform:translateX(-50%);border:5px solid transparent;border-bottom-color:#1a1f2e}
+.fabbar button{position:relative}
+#fabHistory{display:none}
+#fabHistory.has-history{display:flex}
+.fab-badge{position:absolute;top:-5px;right:-5px;background:var(--brand);color:#fff;border-radius:99px;font-size:9px;font-weight:800;min-width:15px;height:15px;display:flex;align-items:center;justify-content:center;padding:0 3px;pointer-events:none;line-height:1}
+.hist-item{display:flex;align-items:center;gap:12px;padding:12px;border-radius:14px}
+.hist-item:hover{background:var(--line)}
 
   </style>
   <script>(function(){var t=localStorage.getItem('figurinhas-theme');if(t==='dark'||t==='light')document.documentElement.setAttribute('data-theme',t)})()</script>
@@ -160,6 +166,7 @@
     <button id="collapseAll" aria-label="Fechar todas as seções"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="7 15 12 10 17 15"/><polyline points="7 9 12 4 17 9"/></svg></button>
 
     <button id="fabSortToggle" aria-label="Ordenação" aria-pressed="false"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="2" y1="6" x2="14" y2="6"/><line x1="2" y1="12" x2="10" y2="12"/><line x1="2" y1="18" x2="6" y2="18"/><path d="M17 4 L17 20 M14 17 L17 20 L20 17"/></svg><span class="sort-label" id="fabSortLabel">Grupos</span></button>
+    <button id="fabHistory" aria-label="Histórico de ações"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span class="fab-badge" id="fabHistoryBadge">0</span></button>
   </nav>
 
   <input id="importCsv" type="file" accept=".csv,text/csv" style="display:none">
@@ -683,6 +690,80 @@ function showToast(msg,undoFn){
   _toastTimer=setTimeout(()=>{el.classList.remove('show');setTimeout(()=>el.remove(),220)},4000);
 }
 
+// ─── Histórico de ações ───────────────────────────────────────────────────────
+const actionHistory=[];
+const MAX_HISTORY=5;
+
+function pushHistory(id,label,wasDone){
+  actionHistory.unshift({id,label,wasDone});
+  if(actionHistory.length>MAX_HISTORY)actionHistory.pop();
+  updateHistoryBtn();
+}
+
+function updateHistoryBtn(){
+  const btn=$('fabHistory');
+  if(!btn)return;
+  const count=actionHistory.length;
+  btn.classList.toggle('has-history',count>0);
+  const badge=$('fabHistoryBadge');
+  if(badge)badge.textContent=count;
+}
+
+function showHistoryPanel(){
+  if(!actionHistory.length)return;
+  const overlay=document.createElement('div');
+  overlay.className='menu-overlay';
+  const panel=document.createElement('div');
+  panel.className='menu-panel';
+  panel.setAttribute('role','dialog');
+  panel.setAttribute('aria-modal','true');
+  panel.setAttribute('aria-label','Histórico de ações');
+
+  function renderItems(){
+    return actionHistory.map((a,i)=>{
+      const icon=a.wasDone
+        ?'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--muted)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>'
+        :'<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#128a46" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>';
+      const action=a.wasDone?'desmarcada':'colada';
+      const player=PLAYER_NAMES[a.id]?`<small style="display:block;color:var(--muted);font-weight:600;font-size:11px">${esc(PLAYER_NAMES[a.id])} · ${action}</small>`:`<small style="display:block;color:var(--muted);font-weight:600;font-size:11px">${action}</small>`;
+      return `<li><div class="hist-item"><span style="flex-shrink:0;display:flex;align-items:center">${icon}</span><span style="flex:1"><span style="font-weight:800;font-size:14px">${esc(a.label)}</span>${player}</span><button class="mini hist-revert-btn" data-hist-idx="${i}">Reverter</button></div></li>`;
+    }).join('');
+  }
+
+  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Últimas ações</div><ul class="menu-sheet-list" id="histList">${renderItems()}</ul>`;
+  overlay.appendChild(panel);
+
+  const onKeydown=e=>{if(e.key==='Escape')close()};
+  overlay._onKeydown=onKeydown;
+  document.addEventListener('keydown',onKeydown);
+  overlay.onclick=e=>{if(e.target===overlay)close()};
+  document.body.appendChild(overlay);
+
+  function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
+
+  requestAnimationFrame(()=>{
+    overlay.classList.add('active');
+    panel.classList.add('active');
+    addDragToClose(panel,close);
+    const list=panel.querySelector('#histList');
+    list.onclick=e=>{
+      const btn=e.target.closest('.hist-revert-btn');
+      if(!btn)return;
+      const idx=+btn.dataset.histIdx;
+      const entry=actionHistory[idx];
+      if(!entry)return;
+      actionHistory.splice(idx,1);
+      setDone(entry.id,entry.wasDone);
+      save();
+      render();
+      updateHistoryBtn();
+      showToast(`${entry.label} revertida`);
+      if(!actionHistory.length){close()}else{list.innerHTML=renderItems()}
+    };
+  });
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 const LOCK_ICON_CLOSED='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>';
 const LOCK_ICON_OPEN='<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>';
 
@@ -751,7 +832,7 @@ function toggleSticker(id,label){
       showToast(`${label} colada`,()=>{settled=true;setDone(id,false);save();render()});
       if(window.matchMedia('(prefers-reduced-motion:reduce)').matches){finish()}
       else{btn.classList.add('anim-exit-missing');btn.addEventListener('animationend',finish,{once:true});setTimeout(finish,400)}
-      return;
+      pushHistory(id,label,wasDone);return;
     }
   }
   setDone(id,!wasDone);
@@ -761,6 +842,7 @@ function toggleSticker(id,label){
   const btn=document.querySelector(`.sticker[data-id="${id}"]`);
   if(btn){const cls=wasDone?'anim-uncheck':'anim-pop';btn.classList.add(cls);btn.addEventListener('animationend',()=>btn.classList.remove(cls),{once:true})}
   showToast(wasDone?`${label} desmarcada`:`${label} colada`,()=>{setDone(id,wasDone);save();render()});
+  pushHistory(id,label,wasDone);
 }
 
 async function loadFromLink(){
@@ -833,7 +915,7 @@ function _showAppLinkModal(url){
   document.getElementById(id).onclick=e=>{if(e.target===document.getElementById(id))container.remove()};
 }
 
-$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
+$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
 
 loadFromLink();
 
