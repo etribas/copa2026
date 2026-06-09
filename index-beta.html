@@ -691,12 +691,16 @@ function showToast(msg,undoFn){
 }
 
 // ─── Histórico de ações ───────────────────────────────────────────────────────
-const actionHistory=[];
+const HISTORY_KEY='figurinhas-action-history';
 const MAX_HISTORY=5;
+const actionHistory=lsGetJson(HISTORY_KEY,[]).slice(0,MAX_HISTORY);
+
+function saveHistory(){lsSet(HISTORY_KEY,JSON.stringify(actionHistory))}
 
 function pushHistory(id,label,wasDone){
   actionHistory.unshift({id,label,wasDone});
   if(actionHistory.length>MAX_HISTORY)actionHistory.pop();
+  saveHistory();
   updateHistoryBtn();
 }
 
@@ -753,6 +757,7 @@ function showHistoryPanel(){
       const entry=actionHistory[idx];
       if(!entry)return;
       actionHistory.splice(idx,1);
+      saveHistory();
       setDone(entry.id,entry.wasDone);
       save();
       render();
@@ -915,7 +920,7 @@ function _showAppLinkModal(url){
   document.getElementById(id).onclick=e=>{if(e.target===document.getElementById(id))container.remove()};
 }
 
-$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();
+$('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();updateHistoryBtn();
 
 loadFromLink();
 
