@@ -960,8 +960,14 @@ function _showStickerTooltip(btn,name){
 $('album').addEventListener('pointerdown',e=>{
   const btn=e.target.closest('.sticker');
   if(!btn)return;
-  const name=PLAYER_NAMES[btn.dataset.id];
-  if(!name)return;
+  const id=btn.dataset.id;
+  const num=id.split('-').pop();
+  let name=PLAYER_NAMES[id];
+  if(!name){
+    if(num==='1')name='Escudo';
+    else if(num==='13')name='Seleção';
+    else return;
+  }
   _lpMoved=false;
   _lpTimer=setTimeout(()=>{_lpTimer=null;_showStickerTooltip(btn,name)},620);
 },{passive:true});
