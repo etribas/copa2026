@@ -68,6 +68,9 @@
     @keyframes sticker-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-3px)}80%{transform:translateX(3px)}}
 .sticker.anim-shake{animation:sticker-shake .35s ease-out}
     @media(prefers-reduced-motion:reduce){.sticker.anim-shake{animation:none}}
+    @keyframes lock-pulse{0%,100%{box-shadow:none}50%{box-shadow:0 0 0 5px rgba(21,94,239,.45)}}
+.menu-btn.anim-lock-pulse{animation:lock-pulse .4s ease-out 3}
+    @media(prefers-reduced-motion:reduce){.menu-btn.anim-lock-pulse{animation:none}}
 .progress-track{height:4px;background:var(--line);margin-top:8px;border-radius:2px;overflow:hidden}
 .progress-fill{height:100%;width:0%;background:var(--brand);border-radius:2px;transition:width .4s ease}
 .confirm-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:999;padding:16px}
@@ -729,6 +732,8 @@ function toggleSticker(id,label){
   if(isLocked){
     const btn=document.querySelector(`.sticker[data-id="${id}"]`);
     if(btn){btn.classList.add('anim-shake');btn.addEventListener('animationend',()=>btn.classList.remove('anim-shake'),{once:true})}
+    const lockBtn=$('lockBtn');
+    if(lockBtn){lockBtn.classList.remove('anim-lock-pulse');void lockBtn.offsetWidth;lockBtn.classList.add('anim-lock-pulse');lockBtn.addEventListener('animationend',()=>lockBtn.classList.remove('anim-lock-pulse'),{once:true})}
     showToast('🔒 Álbum bloqueado');
     return;
   }
