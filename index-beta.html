@@ -349,7 +349,8 @@ function renderSearchChips(){
   container.querySelectorAll('.search-chip').forEach(btn=>{
     btn.onclick=()=>{
       const code=btn.dataset.code;
-      $('q').value=cur===code?'':code;
+      if(cur===code){$('q').blur();return;}
+      $('q').value=code;
       $('q').blur();
       render();
       renderSearchChips();
