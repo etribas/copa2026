@@ -1,4 +1,4 @@
-const CACHE_NAME = 'figurinhas-v2-0-13';
+const CACHE_NAME = 'figurinhas-v2-0-14';
 
 const LOCAL_ASSETS = [
   './index.html',
