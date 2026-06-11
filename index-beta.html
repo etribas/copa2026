@@ -147,7 +147,7 @@
 </head>
 <body>
   <header class="appbar">
-    <div class="title"><h1>Figurinhas Copa 2026</h1><span id="betaBadge" class="pill" style="display:none">BETA</span><button id="shareStickerBtn" class="menu-btn" aria-label="Compartilhar figurinhas" style="margin-left:auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg></button><button id="lockBtn" class="menu-btn" aria-label="Bloquear edição"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button><button id="menuBtn" class="menu-btn" aria-label="Mais ações"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
+    <div class="title"><h1>Figurinhas Copa 2026</h1><span id="betaBadge" class="pill" style="display:none">BETA</span><button id="shareStickerBtn" class="menu-btn" aria-label="Compartilhar figurinhas" style="margin-left:auto"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button><button id="lockBtn" class="menu-btn" aria-label="Bloquear edição"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg></button><button id="menuBtn" class="menu-btn" aria-label="Mais ações"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="12" cy="5" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="12" cy="19" r="2"/></svg></button></div>
 
     <div class="searchbar"><input id="q" placeholder="Buscar grupo, seleção ou figurinha. Ex: BRA1" autocomplete="off"><button class="clear-btn" id="clearSearch" aria-label="Limpar busca">✕</button></div>
 
@@ -514,7 +514,7 @@ function buildPrint(){
 function generateShareLink(){
   const byPrefix={};
   stickers.filter(x=>isDone(x.id)).forEach(x=>{if(!byPrefix[x.prefixo])byPrefix[x.prefixo]=[];byPrefix[x.prefixo].push(+x.numero)});
-  if(!Object.keys(byPrefix).length){alert('Marque algumas figurinhas para compartilhar');return null}
+  if(!Object.keys(byPrefix).length){showToast('Marque algumas figurinhas para compartilhar');return null}
   const data=JSON.stringify(byPrefix);
   const encoded=btoa(data).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
   return `${window.location.origin}${window.location.pathname}#d=${encoded}`
@@ -523,23 +523,21 @@ function generateShareLink(){
 function shareLink(){
   const url=generateShareLink();
   if(!url)return;
-  showShareModal(url);
+  const fallback=()=>navigator.clipboard.writeText(url).then(()=>showToast('✓ Link copiado!')).catch(()=>showToast('Erro ao copiar link'));
+  if(navigator.share){navigator.share({title:'Meu álbum Copa 2026 🏆',url}).catch(e=>{if(e.name!=='AbortError')fallback()})}
+  else{fallback()}
 }
 
 function generateStickerText(type){const isMissing=type==='missing';const parts=[isMissing?'Oi! Aqui estão minhas figurinhas faltantes da Copa 2026 ⚽🏆':'Oi! Aqui estão minhas figurinhas coladas da Copa 2026 ⚽🏆'];GRUPOS.forEach(g=>g.secoes.forEach(sec=>{const items=stickers.filter(x=>x.prefixo===sec.prefixo&&x.secao===sec.nome);const filtered=items.filter(x=>isMissing?!isDone(x.id):isDone(x.id));if(!filtered.length)return;const emoji=FLAG_EMOJIS[sec.prefixo]||'★';parts.push('\n'+emoji+' '+sec.nome+' - '+sec.prefixo+'\n'+filtered.map(x=>x.numero).join('-'))}));return parts.join('\n')}
 
-function showStickerShareModal(initialType){const container=document.createElement('div');document.body.appendChild(container);const onKey=e=>{if(e.key==='Escape'){document.removeEventListener('keydown',onKey);container.remove()}};document.addEventListener('keydown',onKey);function modal(html,setup){container.innerHTML=`<div style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px" id="_ssm_bg"><div style="background:var(--card);border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)">${html}</div></div>`;$('_ssm_bg').onclick=e=>{if(e.target===$('_ssm_bg')){document.removeEventListener('keydown',onKey);container.remove()}};setup()}function step1(){modal(`<h2 style="margin:0 0 12px;font-size:16px;font-weight:700">Compartilhar Figurinhas</h2><p style="margin:0 0 20px;font-size:13px;color:var(--muted)">Escolha quais figurinhas compartilhar:</p><div style="display:flex;gap:8px;margin-bottom:8px"><button id="_ssm_miss" style="flex:1;background:#155eef;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">📋 Faltantes</button><button id="_ssm_done" style="flex:1;background:#128a46;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">✅ Coladas</button></div><button id="_ssm_cls1" style="width:100%;background:var(--line);color:var(--ink);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">Fechar</button>`,()=>{$('_ssm_miss').onclick=()=>step2('missing');$('_ssm_done').onclick=()=>step2('done');$('_ssm_cls1').onclick=()=>{document.removeEventListener('keydown',onKey);container.remove()}})}function step2(type){const text=generateStickerText(type);const title=type==='missing'?'Figurinhas Faltantes':'Figurinhas Coladas';const hasShare=!!navigator.share;modal(`<h2 style="margin:0 0 12px;font-size:16px;font-weight:700">${title}</h2><p style="margin:0 0 20px;font-size:13px;color:var(--muted)">Escolha como compartilhar:</p><div style="display:flex;gap:8px;margin-bottom:8px"><button id="_ssm_copy" style="flex:1;background:#155eef;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">📋 Copiar</button>${hasShare?`<button id="_ssm_wshare" style="flex:1;background:#7a5af8;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">🔗 Compartilhar</button>`:''}</div><div style="display:flex;gap:8px"><button id="_ssm_back" style="flex:1;background:var(--line);color:var(--ink);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">← Voltar</button><button id="_ssm_cls2" style="flex:1;background:var(--line);color:var(--ink);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">Fechar</button></div>`,()=>{$('_ssm_copy').onclick=()=>{navigator.clipboard.writeText(text).then(()=>{document.removeEventListener('keydown',onKey);container.remove();showToast('✓ Texto copiado!')}).catch(()=>alert('Erro ao copiar'))};if(hasShare)$('_ssm_wshare').onclick=async()=>{try{await navigator.share({title:'Figurinhas Copa 2026',text});document.removeEventListener('keydown',onKey);container.remove()}catch(e){if(e.name!=='AbortError')alert('Erro ao compartilhar')}};$('_ssm_back').onclick=step1;$('_ssm_cls2').onclick=()=>{document.removeEventListener('keydown',onKey);container.remove()}})}initialType?step2(initialType):step1()}
-
-function showShareModal(url){
-  const id='shareModal'+Math.random().toString(36).slice(2);
-  const html=`<div id="${id}" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px"><div style="background:var(--card);border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)"><h2 style="margin:0 0 12px;font-size:16px;font-weight:700">Compartilhar Álbum</h2><p style="margin:0 0 20px;font-size:13px;color:var(--muted)">Escolha como compartilhar seu álbum:</p><div style="display:flex;gap:8px;margin-bottom:8px"><button id="copyBtn${id}" style="flex:1;background:#155eef;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">📋 Copiar Link</button><button id="whatsappBtn${id}" style="flex:1;background:#25d366;color:#fff;border:none;border-radius:12px;padding:14px;font-weight:700;cursor:pointer;font-size:13px">💬 WhatsApp</button></div><button id="closeBtn${id}" style="width:100%;background:var(--line);color:var(--ink);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">Fechar</button></div></div>`;
-  const container=document.createElement('div');
-  container.innerHTML=html;
-  document.body.appendChild(container);
-  $('copyBtn'+id).onclick=()=>{navigator.clipboard.writeText(url).then(()=>{alert('✓ Link copiado!')}).catch(()=>{alert('Erro ao copiar')});container.remove()};
-  $('whatsappBtn'+id).onclick=()=>{const msg='Meu álbum Copa 2026 🏆\n'+url;window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`,'_blank');container.remove()};
-  $('closeBtn'+id).onclick=()=>container.remove();
+function shareStickersByType(type){
+  const text=generateStickerText(type);
+  const title=type==='missing'?'Figurinhas Faltantes - Copa 2026':'Figurinhas Coladas - Copa 2026';
+  const fallback=()=>navigator.clipboard.writeText(text).then(()=>showToast('✓ Texto copiado!')).catch(()=>showToast('Erro ao copiar'));
+  if(navigator.share){navigator.share({title,text}).catch(e=>{if(e.name!=='AbortError')fallback()})}
+  else{fallback()}
 }
+
 
 function showThemePicker(){
   const THEMES=[
@@ -867,19 +865,22 @@ async function loadFromLink(){
     const padded=encoded.replace(/-/g,'+').replace(/_/g,'/');
     const padding=(4-(padded.length%4))%4;
     const data=JSON.parse(atob(padded+'='.repeat(padding)));
-    if(await showConfirmModal('Carregar álbum','Carregar este link substituirá suas figurinhas locais. Deseja continuar?')){
+    if(await showConfirmModal('Carregar álbum','Carregar este link substituirá seu album local. Deseja continuar?')){
       state.clear();
+      actionHistory.length=0;saveHistory();updateHistoryBtn();
+      filterMode='all';lsSet(FILTER_KEY,'all');renderFilterButtons();
+      activeGroup='Todos';lsSet(GROUP_KEY,'Todos');
       Object.entries(data).forEach(([prefixo,numeros])=>{numeros.forEach(numero=>{state.add(`${prefixo}-${numero}`)})});
       save();
       render();
       window.history.replaceState({},'',window.location.pathname);
-      alert('✓ Figurinhas carregadas com sucesso!');
+      showToast('✓ Album carregado com sucesso!');
     }else{
       window.history.replaceState({},'',window.location.pathname);
     }
   }catch(e){
     console.error('Erro ao carregar link:',e);
-    alert('Erro ao processar link');
+    showToast('Erro ao processar link');
   }
 }
 
@@ -892,7 +893,7 @@ function showShareMenu(){
   panel.setAttribute('role','dialog');
   panel.setAttribute('aria-modal','true');
   panel.setAttribute('aria-label','Compartilhar');
-  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Compartilhar</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="_sm_app"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>Compartilhar App</button></li><li><button class="menu-sheet-item" id="_sm_link"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>Compartilhar link</button></li><li><button class="menu-sheet-item" id="_sm_miss"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="11" y2="11"/></svg>Figurinhas Faltantes</button></li><li><button class="menu-sheet-item" id="_sm_done"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>Figurinhas Coladas</button></li></ul>`;
+  panel.innerHTML=`<div class="menu-sheet-handle"></div><div class="menu-sheet-title">Compartilhar</div><ul class="menu-sheet-list"><li><button class="menu-sheet-item" id="_sm_miss"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="15" x2="15" y2="15"/><line x1="9" y1="11" x2="11" y2="11"/></svg>Figurinhas Faltantes</button></li><li><button class="menu-sheet-item" id="_sm_link"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg>Álbum - Link de recuperação</button></li><li><button class="menu-sheet-item" id="_sm_app"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>App</button></li></ul>`;
   overlay.appendChild(panel);
   const onKeydown=e=>{if(e.key==='Escape')close()};
   overlay._onKeydown=onKeydown;
@@ -901,32 +902,18 @@ function showShareMenu(){
   document.body.appendChild(overlay);
   function close(){document.removeEventListener('keydown',overlay._onKeydown);overlay.classList.remove('active');panel.classList.remove('active');setTimeout(()=>overlay.remove(),300)}
   requestAnimationFrame(()=>{overlay.classList.add('active');panel.classList.add('active');addDragToClose(panel,close);setTimeout(()=>{
-    document.getElementById('_sm_app').onclick=()=>{close();shareApp()};
+    document.getElementById('_sm_miss').onclick=()=>{close();shareStickersByType('missing')};
     document.getElementById('_sm_link').onclick=()=>{close();shareLink()};
-    document.getElementById('_sm_miss').onclick=()=>{close();showStickerShareModal('missing')};
-    document.getElementById('_sm_done').onclick=()=>{close();showStickerShareModal('done')};
+    document.getElementById('_sm_app').onclick=()=>{close();shareApp()};
   },0)});
 }
 // ─────────────────────────────────────────────────────────────────────────────
 
 function shareApp(){
   const url='https://etribas.github.io/copa2026/';
-  if(navigator.share){navigator.share({title:'Figurinhas Copa 2026',text:'Controle sua coleção de figurinhas da Copa do Mundo 2026.',url}).catch(e=>{if(e.name!=='AbortError')_fallbackShareApp(url)})}
-  else{_fallbackShareApp(url)}
-}
-
-function _fallbackShareApp(url){
-  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(()=>showToast('Link copiado para a área de transferência')).catch(()=>_showAppLinkModal(url))}
-  else{_showAppLinkModal(url)}
-}
-
-function _showAppLinkModal(url){
-  const id='alm'+Math.random().toString(36).slice(2);
-  const container=document.createElement('div');
-  container.innerHTML=`<div id="${id}" style="position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px"><div style="background:var(--card);border-radius:16px;padding:20px;max-width:400px;width:100%;box-shadow:0 20px 25px rgba(0,0,0,.15)"><h2 style="margin:0 0 12px;font-size:16px;font-weight:700">Link do App</h2><p style="margin:0 0 12px;font-size:13px;color:var(--muted)">Copie o link abaixo:</p><input readonly value="${esc(url)}" style="width:100%;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:13px;background:var(--bg);color:var(--ink);margin-bottom:12px" onclick="this.select()"><button id="clsalm${id}" style="width:100%;background:var(--line);color:var(--ink);border:none;border-radius:12px;padding:12px;font-weight:700;cursor:pointer;font-size:13px">Fechar</button></div></div>`;
-  document.body.appendChild(container);
-  document.getElementById('clsalm'+id).onclick=()=>container.remove();
-  document.getElementById(id).onclick=e=>{if(e.target===document.getElementById(id))container.remove()};
+  const fallback=()=>navigator.clipboard.writeText(url).then(()=>showToast('✓ Link copiado!')).catch(()=>showToast('Erro ao copiar link'));
+  if(navigator.share){navigator.share({title:'Figurinhas Copa 2026',text:'Controle sua coleção de figurinhas da Copa do Mundo 2026.',url}).catch(e=>{if(e.name!=='AbortError')fallback()})}
+  else{fallback()}
 }
 
 $('q').oninput=render;$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();updateHistoryBtn();
