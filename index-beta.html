@@ -316,7 +316,7 @@ const stickerLabel=x=>`${x.prefixo}${x.numero}`;
 
 function esc(s){return String(s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]))}
 function norm(v){return String(v||'').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
-function flagHtml(prefixo){const code=FLAGS[prefixo];return code?`<img class="flag" src="https://flagcdn.com/${code}.svg" alt="Bandeira ${prefixo}" loading="lazy">`:`<span class="flag placeholder">★</span>`}
+function flagHtml(prefixo){const code=FLAGS[prefixo];const emoji=FLAG_EMOJIS[prefixo]||'★';return code?`<img class="flag" src="https://flagcdn.com/${code}.svg" alt="Bandeira ${prefixo}" loading="lazy" onerror="this.outerHTML='<span class=&quot;flag placeholder&quot;>${emoji}</span>'">`:`<span class="flag placeholder">${emoji||'★'}</span>`}
 function groupColor(grupo){const i=GRUPOS.findIndex(g=>g.grupo===grupo);return GROUP_COLORS[Math.max(0,i)%GROUP_COLORS.length]}
 function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...state]));updateStats();renderTabs()}
 function saveExpandState(){lsSet(OPEN_TEAMS_KEY,JSON.stringify([...openTeams]));lsSet(CLOSED_TEAMS_KEY,JSON.stringify([...closedTeams]))}

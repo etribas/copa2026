@@ -1,15 +1,28 @@
-const CACHE_NAME = 'figurinhas-v2-0-11';
-const ASSETS = [
+const CACHE_NAME = 'figurinhas-v2-0-13';
+
+const LOCAL_ASSETS = [
   './index.html',
+  './index-beta.html',
   './manifest.json',
   './icon-from-jpeg-192.png',
   './icon-from-jpeg-512.png'
 ];
 
+const FLAG_URLS = [
+  'mx','za','kr','cz','ca','ba','qa','ch','br','ma','ht','gb-sct',
+  'us','py','au','tr','de','cw','ci','ec','nl','jp','se','tn','be',
+  'eg','ir','nz','es','cv','sa','uy','fr','sn','iq','no','ar','dz',
+  'at','jo','pt','cd','uz','co','gb-eng','hr','gh','pa'
+].map(c => `https://flagcdn.com/${c}.svg`);
+
 self.addEventListener('install', event => {
   self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+    caches.open(CACHE_NAME).then(cache =>
+      cache.addAll(LOCAL_ASSETS).then(() =>
+        Promise.allSettled(FLAG_URLS.map(url => cache.add(url).catch(() => {})))
+      )
+    )
   );
 });
 
