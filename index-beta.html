@@ -115,6 +115,7 @@
     html[data-theme="light"] .flag.placeholder{background:#f2f4f7}
     #fabSortToggle{flex-direction:column;gap:1px;padding:6px}
 .sort-label{font-size:9px;font-weight:700;line-height:1;white-space:nowrap;text-align:center}
+.group-chip{font-size:10px;font-weight:800;padding:3px 7px;border-radius:999px;white-space:nowrap}
 .team{position:relative}
 @keyframes ctry-pulse{0%,100%{box-shadow:var(--shadow)}45%{box-shadow:0 0 0 3px rgba(18,138,70,.42),var(--shadow)}}
 .ctry-pulse{animation:ctry-pulse 1.4s ease-in-out}
@@ -396,7 +397,7 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       const _bc=stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length,_bt=stickers.filter(x=>x.secao===sec.nome).length;
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></summary>`;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span style="display:flex;gap:6px;align-items:center"><span class="group-chip" style="background:${groupColor(grupo)}22;color:${groupColor(grupo)}">${esc(grupo)}</span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></span></summary>`;
       d.querySelector('.badge[data-col]').addEventListener('click',toggleBadgeMode);
       const grid = document.createElement('div');
       grid.className='grid';
@@ -425,7 +426,7 @@ function render(){
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
       const _bc=stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length,_bt=stickers.filter(x=>x.secao===sec.nome).length;
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></summary>`;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span style="display:flex;gap:6px;align-items:center"><span class="group-chip" style="background:${groupColor(grupo)}22;color:${groupColor(grupo)}">${esc(grupo)}</span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></span></summary>`;
       d.querySelector('.badge[data-col]').addEventListener('click',toggleBadgeMode);
       const grid = document.createElement('div');
       grid.className='grid';
