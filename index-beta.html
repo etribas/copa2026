@@ -34,7 +34,7 @@
 
     main{max-width:960px;margin:12px auto;padding:0 12px 28px}.hint{color:var(--muted);font-size:12px;margin:14px 2px}
 .group-head{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 8px;padding:8px 8px 8px 10px;border-radius:14px}.group-head h2{font-size:16px;margin:0}.group-actions{display:flex;gap:6px}.mini{border:1px solid var(--line);background:var(--card);border-radius:12px;padding:8px 9px;font-size:12px;font-weight:800;color:var(--ink)}
-.team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap}
+.team{background:var(--card);border:1px solid var(--line);border-radius:20px;margin:10px 0;box-shadow:var(--shadow);overflow:hidden}.team summary{list-style:none;cursor:pointer;padding:14px;display:flex;justify-content:space-between;align-items:center;gap:8px;font-weight:900}.team summary::-webkit-details-marker{display:none}.team-title{display:flex;align-items:center;gap:10px;min-width:0}.team-name{min-width:0}.team-name small{display:block;color:var(--muted);font-weight:700;margin-top:2px}.flag{width:34px;height:24px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(0,0,0,.12);background:#f2f4f7;flex:0 0 auto}.flag.placeholder{display:grid;place-items:center;font-size:15px;font-weight:900;color:#667085}.badge{font-size:12px;color:#344054;background:#f2f4f7;border-radius:999px;padding:5px 8px;white-space:nowrap;cursor:pointer;user-select:none}
 .team-actions{display:flex;gap:8px;padding:0 14px 12px}.team-actions button{flex:1;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:10px;font-weight:800;color:var(--ink)}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:0 14px 14px}.sticker{min-height:44px;border:1px solid var(--line);border-radius:12px;background:var(--card);padding:6px 4px;text-align:center;font-weight:950;cursor:pointer;user-select:none;-webkit-touch-callout:none}.sticker.done{background:#eaf8ef;border-color:#a6dcb8;color:var(--ok)}.empty-msg{color:var(--muted);text-align:center;padding:28px 12px}
 .fabbar{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:10px 8px calc(10px + env(safe-area-inset-bottom,0px));display:flex;justify-content:center;gap:6px}.fabbar button{border:1px solid var(--line);background:var(--card);border-radius:16px;width:56px;height:56px;min-width:44px;min-height:44px;font-size:22px;font-weight:900;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .1s;color:var(--ink)}.fabbar button:hover{background:var(--line)}.fabbar button:active{transform:scale(.93)}.fabbar button.active{background:var(--brand);border-color:var(--brand);color:#fff}.fab-az{font-size:14px;letter-spacing:.5px}input[type=file]{display:none}.print-only{display:none}
     @media(min-width:620px){.grid{grid-template-columns:repeat(8,1fr)}.fabbar{max-width:720px;left:50%;transform:translateX(-50%);border:1px solid var(--line);border-bottom:0;border-radius:24px 24px 0 0}.title h1{font-size:22px}.stat b{font-size:22px}}
@@ -308,6 +308,7 @@ const _sg=lsGet(GROUP_KEY,'Todos');
 let activeGroup=_validGroups.has(_sg)?_sg:'Todos';
 let sortMode = localStorage.getItem('figurinhas-sort-mode') || 'group';
 let isLocked = localStorage.getItem('figurinhas-locked') === '1';
+let badgeMode = localStorage.getItem('figurinhas-badge-mode') || 'count';
 const _sf=lsGet(FILTER_KEY,'all');
 let filterMode=['all','done','missing'].includes(_sf)?_sf:'all';
 
@@ -322,6 +323,8 @@ function save(){localStorage.setItem(STORAGE_KEY,JSON.stringify([...state]));upd
 function saveExpandState(){lsSet(OPEN_TEAMS_KEY,JSON.stringify([...openTeams]));lsSet(CLOSED_TEAMS_KEY,JSON.stringify([...closedTeams]))}
 function isDone(id){return state.has(id)}
 function setDone(id,done){done?state.add(id):state.delete(id)}
+function badgeText(col,total){const m=total-col;return badgeMode==='count'?String(m):`${m}/${total}`}
+function toggleBadgeMode(e){e.preventDefault();e.stopPropagation();badgeMode=badgeMode==='ratio'?'count':'ratio';localStorage.setItem('figurinhas-badge-mode',badgeMode);document.querySelectorAll('.badge[data-col]').forEach(el=>{el.textContent=badgeText(+el.dataset.col,+el.dataset.total)})}
 
 function showConfirmModal(title,message){return new Promise(resolve=>{const modal=$('confirmModal');$('confirmTitle').textContent=title;$('confirmMsg').textContent=message;modal.classList.add('active');function close(r){modal.classList.remove('active');document.removeEventListener('keydown',onKey);modal.onclick=null;$('confirmCancel').onclick=null;$('confirmOk').onclick=null;resolve(r)}function onKey(e){if(e.key==='Escape')close(false)}document.addEventListener('keydown',onKey);modal.onclick=e=>{if(e.target===modal)close(false)};$('confirmCancel').onclick=()=>close(false);$('confirmOk').onclick=()=>close(true)})}
 
@@ -392,7 +395,9 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
+      const _bc=stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length,_bt=stickers.filter(x=>x.secao===sec.nome).length;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></summary>`;
+      d.querySelector('.badge[data-col]').addEventListener('click',toggleBadgeMode);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -419,7 +424,9 @@ function render(){
       d.dataset.key=key;
       d.open = isTeamOpen(key, grupo, q);
       d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
+      const _bc=stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length,_bt=stickers.filter(x=>x.secao===sec.nome).length;
+      d.innerHTML = `<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></summary>`;
+      d.querySelector('.badge[data-col]').addEventListener('click',toggleBadgeMode);
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
@@ -451,7 +458,9 @@ function render(){
         d.dataset.key=key;
         d.open = isTeamOpen(key, g.grupo, q);
         d.ontoggle = ()=>{if(d.open){openTeams.add(key);closedTeams.delete(key)}else{openTeams.delete(key);closedTeams.add(key)};saveExpandState()};
-        d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge">${stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length}/${stickers.filter(x=>x.secao===sec.nome).length}</span></summary>`;
+        const _bc=stickers.filter(x=>x.secao===sec.nome&&isDone(x.id)).length,_bt=stickers.filter(x=>x.secao===sec.nome).length;
+        d.innerHTML=`<summary><span class="team-title">${flagHtml(sec.prefixo)}<span class="team-name">${esc(sec.nome)}<small>${esc(sec.prefixo)}</small></span></span><span class="badge" data-col="${_bc}" data-total="${_bt}">${badgeText(_bc,_bt)}</span></summary>`;
+        d.querySelector('.badge[data-col]').addEventListener('click',toggleBadgeMode);
         const grid = document.createElement('div');
         grid.className='grid';
         teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
