@@ -323,22 +323,38 @@ function isSearchMeaningful(term){const t=norm(term);if(Object.keys(FLAGS).some(
 function updateSearchChips(){renderSearchChips()}
 function renderSearchChips(){
   const container=$('searchChips');if(!container)return;
-  const q=norm($('q').value);
+  const raw=$('q').value.trim();
+  const q=norm(raw);
+  container.onmousedown=e=>e.preventDefault();
+  if(!q){
+    const hist=searchHistory.filter(c=>ALL_CODES.includes(c)).slice(0,5);
+    if(!hist.length){container.style.display='none';return}
+    container.style.display='flex';
+    container.innerHTML=hist.map(code=>`<button class="search-chip" data-code="${esc(code)}">${esc(code)}</button>`).join('');
+    container.querySelectorAll('.search-chip').forEach(btn=>{
+      btn.onclick=()=>{
+        $('q').value=btn.dataset.code;
+        $('q').blur();
+        render();
+        renderSearchChips();
+      };
+    });
+    return;
+  }
+  const cur=raw.toUpperCase();
   const matches=ALL_CODES.filter(code=>norm(code).includes(q)||norm(PREFIX_TO_NAME[code]||'').includes(q)).sort((a,b)=>a.localeCompare(b));
   if(!matches.length){container.style.display='none';return}
   container.style.display='flex';
-  const cur=$('q').value.trim().toUpperCase();
   container.innerHTML=matches.map(code=>`<button class="search-chip${code===cur?' active':''}" data-code="${esc(code)}">${esc(code)}</button>`).join('');
   container.querySelectorAll('.search-chip').forEach(btn=>{
-    btn.addEventListener('pointerdown',e=>{
-      e.preventDefault();
+    btn.onclick=()=>{
       const code=btn.dataset.code;
       $('q').value=cur===code?'':code;
       $('q').blur();
       render();
       renderSearchChips();
       requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active');if(a)a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})});
-    });
+    };
   });
   requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active');if(a)a.scrollIntoView({behavior:'instant',inline:'center',block:'nearest'})});
 }
@@ -947,7 +963,7 @@ function shareApp(){
   else{fallback()}
 }
 
-$('q').oninput=()=>{render();updateSearchChips()};$('q').addEventListener('focus',()=>{$('q').select();updateSearchChips()});$('q').addEventListener('blur',()=>{const term=$('q').value.trim();if(term.length>=2&&isSearchMeaningful(term)){searchHistory=[term,...searchHistory.filter(t=>t!==term)].slice(0,4);lsSet(SEARCH_HIST_KEY,JSON.stringify(searchHistory));renderSearchChips()}});$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));$('q').focus();updateSearchChips();};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus();updateSearchChips()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();updateHistoryBtn();
+$('q').oninput=()=>{render();updateSearchChips()};$('q').addEventListener('focus',()=>{$('q').select();updateSearchChips()});$('q').addEventListener('blur',()=>{const term=$('q').value.trim().toUpperCase();if(ALL_CODES.includes(term)){searchHistory=[term,...searchHistory.filter(t=>t!==term)].slice(0,5);lsSet(SEARCH_HIST_KEY,JSON.stringify(searchHistory))}renderSearchChips()});$('q').addEventListener('keydown',e=>{if(e.key==='Enter')e.target.blur()});$('clearSearch').onclick=()=>{const y=window.scrollY;$('q').value='';render();requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));$('q').focus();updateSearchChips();};$('shareStickerBtn').onclick=showShareMenu;$('lockBtn').onclick=toggleLock;updateLockBtn();$('menuBtn').onclick=openMenu;$('importCsv').onchange=e=>{const f=e.target.files[0];if(f)f.text().then(importCsv);e.target.value=''};$('expandAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.add(key);closedTeams.delete(key)});saveExpandState();render()};$('collapseAll').onclick=()=>{allTeamKeys().forEach(key=>{openTeams.delete(key);closedTeams.add(key)});saveExpandState();render()};$('fabSortToggle').onclick=openSortMenu;$('fabHistory').onclick=showHistoryPanel;$('fabSearch').onclick=()=>{$('q').value='';render();window.scrollTo({top:0,behavior:'smooth'});$('q').focus();updateSearchChips()};renderSortButtons();$('statAll').onclick=()=>setFilterMode('all');$('statDone').onclick=()=>setFilterMode('done');$('statMissing').onclick=()=>setFilterMode('missing');$('statPct').onclick=()=>setFilterMode('all');renderFilterButtons();updateHistoryBtn();
 
 loadFromLink();
 
