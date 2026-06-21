@@ -431,7 +431,14 @@ function render(){
   if(sortMode==='alpha'){
     const sections = GRUPOS.filter(g=>activeGroup==='Todos'||g.grupo===activeGroup)
       .flatMap(g=>g.secoes.map(sec=>({grupo:g.grupo,sec})))
-      .sort((a,b)=>a.sec.nome.localeCompare(b.sec.nome,'pt',{sensitivity:'base'}));
+      .sort((a,b)=>{
+        const aLast=a.sec.prefixo==='FWC'||a.sec.prefixo==='CC';
+        const bLast=b.sec.prefixo==='FWC'||b.sec.prefixo==='CC';
+        if(aLast&&bLast) return a.sec.prefixo==='FWC'?-1:b.sec.prefixo==='FWC'?1:0;
+        if(aLast) return 1;
+        if(bLast) return -1;
+        return a.sec.prefixo.localeCompare(b.sec.prefixo,'pt',{sensitivity:'base'});
+      });
     sections.forEach(({grupo,sec})=>{
       const teamItems = itemsNow.filter(x=>x.secao===sec.nome);
       if(!teamItems.length) return;
