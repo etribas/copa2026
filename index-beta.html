@@ -318,46 +318,46 @@ let badgeMode = localStorage.getItem('figurinhas-badge-mode') || 'count';
 const _sf=lsGet(FILTER_KEY,'all');
 let filterMode=['all','done','missing'].includes(_sf)?_sf:'all';
 let searchHistory=lsGetJson(SEARCH_HIST_KEY,[]);
+const CHIP_FILTER_KEY='figurinhas-chip-filter';
+const _cf=lsGet(CHIP_FILTER_KEY,'none');
+let chipFilter=['none','escudo','selecao'].includes(_cf)?_cf:'none';
 
 function isSearchMeaningful(term){const t=norm(term);if(Object.keys(FLAGS).some(p=>norm(p)===t))return true;if(GRUPOS.some(g=>norm(g.grupo).includes(t)))return true;if(GRUPOS.some(g=>g.secoes.some(s=>norm(s.nome).includes(t))))return true;return false}
 function updateSearchChips(){renderSearchChips()}
+function setChipFilter(v){chipFilter=chipFilter===v?'none':v;lsSet(CHIP_FILTER_KEY,chipFilter);render();renderSearchChips()}
 function renderSearchChips(){
   const container=$('searchChips');if(!container)return;
   const raw=$('q').value.trim();
   const q=norm(raw);
   container.onmousedown=e=>e.preventDefault();
+  const shieldChip=`<button class="search-chip${chipFilter==='escudo'?' active':''}" id="shieldChip" type="button" aria-pressed="${chipFilter==='escudo'}">🛡️ Escudos</button>`;
+  const selecaoChip=`<button class="search-chip${chipFilter==='selecao'?' active':''}" id="selecaoChip" type="button" aria-pressed="${chipFilter==='selecao'}">👥 Seleção</button>`;
+  let rest;
   if(!q){
     const hist=searchHistory.filter(c=>ALL_CODES.includes(c)).slice(0,5);
-    if(!hist.length){container.style.display='none';return}
-    container.style.display='flex';
-    container.innerHTML=hist.map(code=>`<button class="search-chip" data-code="${esc(code)}">${esc(code)}</button>`).join('');
-    container.querySelectorAll('.search-chip').forEach(btn=>{
-      btn.onclick=()=>{
-        $('q').value=btn.dataset.code;
-        $('q').blur();
-        render();
-        renderSearchChips();
-      };
-    });
-    return;
+    rest=hist.map(code=>`<button class="search-chip" data-code="${esc(code)}">${esc(code)}</button>`).join('');
+  } else {
+    const cur=raw.toUpperCase();
+    const matches=ALL_CODES.filter(code=>norm(code).includes(q)||norm(PREFIX_TO_NAME[code]||'').includes(q)).sort((a,b)=>a.localeCompare(b));
+    rest=matches.map(code=>`<button class="search-chip${code===cur?' active':''}" data-code="${esc(code)}">${esc(code)}</button>`).join('');
   }
-  const cur=raw.toUpperCase();
-  const matches=ALL_CODES.filter(code=>norm(code).includes(q)||norm(PREFIX_TO_NAME[code]||'').includes(q)).sort((a,b)=>a.localeCompare(b));
-  if(!matches.length){container.style.display='none';return}
   container.style.display='flex';
-  container.innerHTML=matches.map(code=>`<button class="search-chip${code===cur?' active':''}" data-code="${esc(code)}">${esc(code)}</button>`).join('');
-  container.querySelectorAll('.search-chip').forEach(btn=>{
+  container.innerHTML=shieldChip+selecaoChip+rest;
+  $('shieldChip').onclick=()=>setChipFilter('escudo');
+  $('selecaoChip').onclick=()=>setChipFilter('selecao');
+  container.querySelectorAll('.search-chip[data-code]').forEach(btn=>{
     btn.onclick=()=>{
       const code=btn.dataset.code;
+      const cur=$('q').value.trim().toUpperCase();
       if(cur===code){$('q').blur();return;}
       $('q').value=code;
       $('q').blur();
       render();
       renderSearchChips();
-      requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active');if(a)a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})});
+      requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active[data-code]');if(a)a.scrollIntoView({behavior:'smooth',inline:'center',block:'nearest'})});
     };
   });
-  requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active');if(a)a.scrollIntoView({behavior:'instant',inline:'center',block:'nearest'})});
+  requestAnimationFrame(()=>{const a=container.querySelector('.search-chip.active[data-code]');if(a)a.scrollIntoView({behavior:'instant',inline:'center',block:'nearest'})});
 }
 
 const $=id=>document.getElementById(id);
@@ -377,8 +377,11 @@ function toggleBadgeMode(e){e.preventDefault();e.stopPropagation();badgeMode=bad
 function showConfirmModal(title,message){return new Promise(resolve=>{const modal=$('confirmModal');$('confirmTitle').textContent=title;$('confirmMsg').textContent=message;modal.classList.add('active');function close(r){modal.classList.remove('active');document.removeEventListener('keydown',onKey);modal.onclick=null;$('confirmCancel').onclick=null;$('confirmOk').onclick=null;resolve(r)}function onKey(e){if(e.key==='Escape')close(false)}document.addEventListener('keydown',onKey);modal.onclick=e=>{if(e.target===modal)close(false)};$('confirmCancel').onclick=()=>close(false);$('confirmOk').onclick=()=>close(true)})}
 
 function itemMatches(x,q){return !q||norm(x.grupo).includes(q)||norm(x.secao).includes(q)||norm(x.prefixo).includes(q)||norm(x.numero).includes(q)||norm(x.id).includes(q)||norm(`${x.prefixo} ${x.numero}`).includes(q)||norm(stickerLabel(x)).includes(q)}
-function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&(filterMode==='all'||(filterMode==='missing'&&!isDone(x.id))||(filterMode==='done'&&isDone(x.id))))}
-function visibleItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q))}
+function isShield(x){return x.numero==='1'&&x.prefixo!=='FWC'&&x.prefixo!=='CC'}
+function isSelecao(x){return x.numero==='13'&&x.prefixo!=='FWC'&&x.prefixo!=='CC'}
+function passesChipFilter(x){return chipFilter==='none'||(chipFilter==='escudo'&&isShield(x))||(chipFilter==='selecao'&&isSelecao(x))}
+function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&passesChipFilter(x)&&(filterMode==='all'||(filterMode==='missing'&&!isDone(x.id))||(filterMode==='done'&&isDone(x.id))))}
+function visibleItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&passesChipFilter(x))}
 function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredItems();return GRUPOS.flatMap(g=>g.secoes.map(sec=>({g,sec}))).filter(({g,sec})=>(activeGroup==='Todos'||g.grupo===activeGroup)&&items.some(x=>x.grupo===g.grupo&&x.secao===sec.nome)).map(({g,sec})=>`${g.grupo}|${sec.prefixo}`)}
 function allTeamKeys(){return GRUPOS.flatMap(g=>g.secoes.map(sec=>`${g.grupo}|${sec.prefixo}`))}
 
