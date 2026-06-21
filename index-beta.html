@@ -378,6 +378,7 @@ function showConfirmModal(title,message){return new Promise(resolve=>{const moda
 
 function itemMatches(x,q){return !q||norm(x.grupo).includes(q)||norm(x.secao).includes(q)||norm(x.prefixo).includes(q)||norm(x.numero).includes(q)||norm(x.id).includes(q)||norm(`${x.prefixo} ${x.numero}`).includes(q)||norm(stickerLabel(x)).includes(q)}
 function filteredItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q)&&(filterMode==='all'||(filterMode==='missing'&&!isDone(x.id))||(filterMode==='done'&&isDone(x.id))))}
+function visibleItems(){const q=norm($('q').value);return stickers.filter(x=>(activeGroup==='Todos'||x.grupo===activeGroup)&&itemMatches(x,q))}
 function allVisibleTeamKeys(){const q=norm($('q').value);const items=filteredItems();return GRUPOS.flatMap(g=>g.secoes.map(sec=>({g,sec}))).filter(({g,sec})=>(activeGroup==='Todos'||g.grupo===activeGroup)&&items.some(x=>x.grupo===g.grupo&&x.secao===sec.nome)).map(({g,sec})=>`${g.grupo}|${sec.prefixo}`)}
 function allTeamKeys(){return GRUPOS.flatMap(g=>g.secoes.map(sec=>`${g.grupo}|${sec.prefixo}`))}
 
@@ -426,6 +427,7 @@ function render(){
   const q=norm($('q').value);
   album.innerHTML='';
   const itemsNow=filteredItems();
+  const itemsVisible=visibleItems();
   let shown=0;
 
   if(sortMode==='alpha'){
@@ -441,9 +443,9 @@ function render(){
       });
     sections.forEach(({grupo,sec})=>{
       const teamItems = itemsNow.filter(x=>x.secao===sec.nome);
-      if(!teamItems.length) return;
-      shown += teamItems.length;
-      const col = teamItems.filter(x=>isDone(x.id)).length;
+      const teamVisible = itemsVisible.filter(x=>x.secao===sec.nome);
+      if(!teamVisible.length) return;
+      shown += teamVisible.length;
       const key = `${grupo}|${sec.prefixo}`;
       const d = document.createElement('details');
       d.className='team';
@@ -456,7 +458,7 @@ function render(){
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
-      addWatermarkIfComplete(grid,col,teamItems.length);
+      addWatermarkIfComplete(grid,_bc,_bt);
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -470,9 +472,9 @@ function render(){
     });
     sections.forEach(({grupo,sec})=>{
       const teamItems = itemsNow.filter(x=>x.secao===sec.nome);
-      if(!teamItems.length) return;
-      shown += teamItems.length;
-      const col = teamItems.filter(x=>isDone(x.id)).length;
+      const teamVisible = itemsVisible.filter(x=>x.secao===sec.nome);
+      if(!teamVisible.length) return;
+      shown += teamVisible.length;
       const key = `${grupo}|${sec.prefixo}`;
       const d = document.createElement('details');
       d.className='team';
@@ -485,7 +487,7 @@ function render(){
       const grid = document.createElement('div');
       grid.className='grid';
       teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
-      addWatermarkIfComplete(grid,col,teamItems.length);
+      addWatermarkIfComplete(grid,_bc,_bt);
       d.appendChild(grid);
       album.appendChild(d);
     });
@@ -493,9 +495,9 @@ function render(){
     const groups = GRUPOS.filter(g=>activeGroup==='Todos'||g.grupo===activeGroup);
     groups.forEach(g=>{
       const groupItems = itemsNow.filter(x=>x.grupo===g.grupo);
-      if(!groupItems.length) return;
-      shown += groupItems.length;
-      const gd = groupItems.filter(x=>isDone(x.id)).length;
+      const groupVisible = itemsVisible.filter(x=>x.grupo===g.grupo);
+      if(!groupVisible.length) return;
+      shown += groupVisible.length;
       const head = document.createElement('div');
       head.className='group-head';
       head.style.borderLeft=`8px solid ${groupColor(g.grupo)}`;
@@ -505,8 +507,8 @@ function render(){
       const sections = g.secoes;
       sections.forEach(sec=>{
         const teamItems=groupItems.filter(x=>x.secao===sec.nome);
-        if(!teamItems.length) return;
-        const col = teamItems.filter(x=>isDone(x.id)).length;
+        const teamVisible=groupVisible.filter(x=>x.secao===sec.nome);
+        if(!teamVisible.length) return;
         const key = `${g.grupo}|${sec.prefixo}`;
         const d = document.createElement('details');
         d.className='team';
@@ -519,7 +521,7 @@ function render(){
         const grid = document.createElement('div');
         grid.className='grid';
         teamItems.forEach(x=>{const b=document.createElement('button');b.className='sticker'+(isDone(x.id)?' done':'');b.dataset.id=x.id;b.setAttribute('aria-label',`${stickerLabel(x)} – ${isDone(x.id)?'colada':'faltante'}`);b.innerHTML=esc(stickerLabel(x));b.onclick=()=>toggleSticker(x.id,stickerLabel(x));grid.appendChild(b)});
-        addWatermarkIfComplete(grid,col,teamItems.length);
+        addWatermarkIfComplete(grid,_bc,_bt);
         d.appendChild(grid);
         album.appendChild(d);
       });
