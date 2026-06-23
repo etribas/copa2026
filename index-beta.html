@@ -588,7 +588,7 @@ function shareLink(){
   else{fallback()}
 }
 
-function generateStickerText(type){const isMissing=type==='missing';const parts=[isMissing?'Oi! Aqui estão minhas figurinhas faltantes da Copa 2026 ⚽🏆':'Oi! Aqui estão minhas figurinhas coladas da Copa 2026 ⚽🏆'];GRUPOS.forEach(g=>g.secoes.forEach(sec=>{const items=stickers.filter(x=>x.prefixo===sec.prefixo&&x.secao===sec.nome);const filtered=items.filter(x=>isMissing?!isDone(x.id):isDone(x.id));if(!filtered.length)return;const emoji=FLAG_EMOJIS[sec.prefixo]||'★';parts.push(emoji+' '+sec.nome+'\n'+sec.prefixo+'-'+filtered.map(x=>x.numero).join('-'))}));return parts.join('\n')}
+function generateStickerText(type){const isMissing=type==='missing';const parts=[isMissing?'Oi! Aqui estão minhas figurinhas faltantes da Copa 2026 ⚽🏆':'Oi! Aqui estão minhas figurinhas coladas da Copa 2026 ⚽🏆'];GRUPOS.forEach(g=>g.secoes.forEach(sec=>{const items=stickers.filter(x=>x.prefixo===sec.prefixo&&x.secao===sec.nome);const filtered=items.filter(x=>isMissing?!isDone(x.id):isDone(x.id));if(!filtered.length)return;const emoji=FLAG_EMOJIS[sec.prefixo]||'★';parts.push(emoji+' '+sec.prefixo+'   '+filtered.map(x=>x.numero).join('-'))}));return parts.join('\n')}
 
 function shareStickersByType(type){
   const text=generateStickerText(type);
